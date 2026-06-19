@@ -13,7 +13,7 @@ It keeps six concerns separate:
 5. `research-verification` — verify public tools, APIs, versions, and error behavior against current sources.
 6. `codex-capability-router` — select installed skills, plugins, apps, MCP tools, or safe discovery candidates.
 
-The default shortcut aliases are `进化` for a full evolution pass and `吞噬` for capability absorption. They can be renamed or removed after installation.
+Shortcut aliases are local configuration. On first installation, each user chooses one shortcut for a full evolution pass and another for capability absorption. The public framework does not impose personal trigger words.
 
 ## Privacy Model
 
@@ -21,21 +21,23 @@ This repository contains no real trigger evidence, generated capability inventor
 
 `skills/codex-capability-router/data/` is generated locally and ignored by Git. `trigger-candidates.md` is an empty ledger template. `external-skill-registry.md` is a neutral configuration template.
 
-## Install
+## Install Or Update
 
-Copy the desired folders from `skills/` into your Codex skills directory:
+Clone or download the repository, then run from its root:
 
 ```text
-~/.codex/skills/
-  skill-evolution-core/
-  skill-evolution-router/
-  project-rules-router/
-  coding-debug-rules/
-  research-verification/
-  codex-capability-router/
+python scripts/install_or_update.py
 ```
 
-Install all six for the complete routed system. The skills use Markdown and YAML; the capability-registry and validation scripts require Python 3 and otherwise use the standard library.
+On first installation, the script asks for two distinct shortcut aliases and installs all six routed skills. For unattended first installation, supply both choices explicitly:
+
+```text
+python scripts/install_or_update.py --non-interactive --evolution-trigger "YOUR_EVOLUTION_SHORTCUT" --absorption-trigger "YOUR_ABSORPTION_SHORTCUT"
+```
+
+Run the same script after pulling a newer repository version. Saved shortcuts and local personal evolution are preserved by default. Unchanged framework files update automatically; locally modified files remain in place, while incoming copies are written under `~/.codex/.skill-evolution-updates/` for review.
+
+Installations created before the manifest existed are handled conservatively: existing files are preserved and incoming versions are staged for review. The installer uses Python 3 and otherwise only the standard library.
 
 ## Validate
 
@@ -67,6 +69,7 @@ python ~/.codex/skills/codex-capability-router/scripts/refresh_plugin_candidates
 - Put always-on personal preferences in global guidance rather than publishing them inside a skill.
 - Put repository commands and conventions in the repository's `AGENTS.md`.
 - Copy `templates/project-skill-template/` for private project knowledge.
+- Keep `skill-evolution-entry/`, `trigger-candidates.md`, and `external-skill-registry.md` local; the updater never overwrites them.
 - Keep real trigger evidence and local capability inventories private.
 - Run the validator and [privacy checklist](docs/privacy-checklist.md) before publishing a customized fork.
 

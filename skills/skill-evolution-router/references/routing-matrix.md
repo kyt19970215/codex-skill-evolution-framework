@@ -13,7 +13,7 @@
 - Project skill such as `example-project`: project terms, source priorities, project paths, local commands, architecture choices, domain-specific known issues, and project-specific examples.
 - Global guidance: always-on answer style, caution level, language preference, and broad personal working defaults.
 - Installed upstream skill: source of truth for a mature heavy workflow; keep local trigger, precedence, and safety adapters in `codex-capability-router` instead of copying its body.
-- `skill-evolution-core`: also owns the forced `吞噬` entry point for installing and integrating a selected capability, closing global dependencies, auditing overlap, absorbing light rules, and routing heavy workflows.
+- `skill-evolution-core`: also owns the capability-absorption workflow reached through the locally configured absorption shortcut; it installs and integrates a selected capability, closes global dependencies, audits overlap, absorbs light rules, and routes heavy workflows.
 
 ## Decision Order
 
@@ -40,7 +40,7 @@ Keep local when any essential condition is project-only. Split the rule when onl
 
 ## Trigger Candidate Handling
 
-- If a phrase appears during a forced `进化` run, record it as a trigger candidate only when the intended destination is clear.
+- If a phrase appears during a run invoked by the configured evolution shortcut, record it as a trigger candidate only when the intended destination is clear.
 - Three matching occurrences can promote the phrase to a trigger rule.
 - Count only same-intent and same-destination occurrences; do not count identical words used for different tasks.
 - Promote narrow triggers before broad ones.

@@ -13,7 +13,7 @@
 5. `research-verification`：通过当前公开来源验证工具、API、版本和报错行为。
 6. `codex-capability-router`：从已安装的 Skill、插件、应用和 MCP 工具中选择合适能力。
 
-默认保留两个中文快捷触发词：`进化` 用于完整进化流程，`吞噬` 用于吸收并整合外部能力。安装后可以自行修改或删除。
+快捷触发词属于每位使用者自己的本地配置。首次安装时，使用者分别选择一个完整进化入口和一个能力吸收入口；公开框架不预设个人触发词。
 
 ## 隐私边界
 
@@ -21,11 +21,23 @@
 
 `trigger-candidates.md` 和 `external-skill-registry.md` 都是空白模板；能力数据库只在使用者本机生成，并已被 Git 忽略。
 
-## 安装
+## 安装或更新
 
-将 `skills/` 下需要的目录复制到 `~/.codex/skills/`。若要获得完整路由功能，请安装全部六个 Skill。
+克隆或下载仓库后，在仓库根目录运行：
 
-框架主体只使用 Markdown 和 YAML；本机能力索引与验证脚本需要 Python 3，且只依赖 Python 标准库。
+```text
+python scripts/install_or_update.py
+```
+
+首次安装会要求选择两个不同的快捷入口，并安装完整的六个路由 Skill。无人值守安装时必须显式传入两个选择：
+
+```text
+python scripts/install_or_update.py --non-interactive --evolution-trigger "YOUR_EVOLUTION_SHORTCUT" --absorption-trigger "YOUR_ABSORPTION_SHORTCUT"
+```
+
+拉取新版仓库后再次运行同一脚本即可更新。脚本默认保留已选入口和本地个人进化：未修改的框架文件会自动升级；检测到本地修改时保留原文件，并把新版放入 `~/.codex/.skill-evolution-updates/` 供使用者比较。
+
+对于还没有安装清单的旧版本，更新器采用保守策略：已有文件不覆盖，新版进入待处理目录。安装器需要 Python 3，且只依赖 Python 标准库。
 
 ## 验证
 
@@ -42,6 +54,7 @@ python scripts/validate_framework.py
 - 长期个人偏好放入个人全局规则，不要提交到公开 Skill。
 - 仓库命令和约定放入该仓库的 `AGENTS.md`。
 - 使用 `templates/project-skill-template/` 创建私有项目 Skill。
+- `skill-evolution-entry/`、`trigger-candidates.md` 和 `external-skill-registry.md` 属于本地个人数据，更新器永不覆盖。
 - 真实触发记录和本机能力数据库始终保持私有。
 - 公开定制版本前重新运行验证器和[隐私检查表](docs/privacy-checklist.md)。
 

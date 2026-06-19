@@ -1,6 +1,6 @@
 # Trigger Learning
 
-Use this reference when the user forces skill evolution with `进化` and the preceding conversation suggests a personal trigger word or phrase should be learned.
+Use this reference when the user invokes the configured evolution shortcut and the preceding conversation suggests a personal trigger word or phrase should be learned.
 
 ## Goal
 
@@ -14,7 +14,7 @@ Use `references/trigger-candidates.md` as the ledger.
 
 For each forced evolution run:
 
-1. Identify the user's key phrase or pattern before `进化`.
+1. Identify the user's key phrase or pattern before the configured evolution shortcut.
 2. Normalize it into a short trigger candidate.
 3. Record the routing outcome, such as `coding-debug-rules`, `research-verification`, `project skill`, or `global guidance`.
 4. Increment the count only when the new case has the same intent and same destination as earlier cases.

@@ -1,6 +1,6 @@
 ---
 name: skill-evolution-router
-description: Classification and routing workflow for reusable Codex rules, lessons, failure shields, source priorities, trigger-word learning, and project knowledge. Use when the user asks to save, remember, add, classify, split, promote, or organize a rule; when they mention skill evolution, "进化", global vs project rules, reusable lessons, failure learning, semantic rule capture, personal trigger words, or where a piece of knowledge should live; or before editing skills from a newly discovered durable lesson.
+description: Classification and routing workflow for reusable Codex rules, lessons, failure shields, source priorities, trigger-word learning, and project knowledge. Use when the user asks to save, remember, add, classify, split, promote, or organize a rule; when they mention skill evolution, use the locally configured evolution shortcut, compare global vs project rules, capture reusable lessons or failure learning, identify personal trigger words, or decide where a piece of knowledge should live; or before editing skills from a newly discovered durable lesson.
 ---
 
 # Skill Evolution Router
@@ -31,7 +31,7 @@ Use this skill to decide where durable knowledge belongs before editing any skil
 
 4. If the user used a strong capture marker, use `references/semantic-rule-capture.md`.
 
-5. If the rule comes from repeated forced `进化` usage, use `skill-evolution-core/references/trigger-learning.md` before promotion.
+5. If the rule comes from repeated use of the configured evolution shortcut, use `skill-evolution-core/references/trigger-learning.md` before promotion.
 
 6. Edit only the narrowest durable home:
    - global type skill for reusable process
