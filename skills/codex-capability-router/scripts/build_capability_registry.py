@@ -35,7 +35,7 @@ ROUTE_ROWS = [
     ("openai_docs", "OpenAI API Codex model docs official latest GPT", "openai-docs", "research-verification", "No candidate install needed if docs skill is installed.", "Use official OpenAI docs route."),
     ("coding_debug", "code shell build test dependency path encoding quoting script", "coding-debug-rules", "research-verification", "No candidate install needed.", "Use for local technical work."),
     ("research_verification", "public tool version API dependency compatibility error install upgrade", "research-verification", "coding-debug-rules", "No candidate install needed.", "Use for current public facts."),
-    ("skill_evolution", "skill evolution create update split absorb plugin architecture rule remember 吞噬", "skill-evolution-core", "skill-evolution-router", "No candidate install needed.", "Use before editing skills or when the forced absorption shortcut is invoked."),
+    ("skill_evolution", "skill evolution create update split absorb plugin architecture rule remember 技能演化 能力吸收", "skill-evolution-core", "skill-evolution-router", "No candidate install needed.", "Use before editing skills or when the configured absorption shortcut is invoked."),
     ("content_visuals", "article illustration cover image infographic visual summary 为文章配图 封面 信息图 可视化", "installed-visual-workflow", "installed-image-generation-workflow", "Ask before installing a missing visual capability.", "Choose the narrow workflow for the requested visual artifact."),
     ("software_workflow", "requirements brainstorming implementation plan TDD parallel agents code review verification 需求 计划 测试驱动 并行 开发 审查 验证", "installed-development-workflow", "coding-debug-rules", "No candidate install needed when a matching workflow is installed.", "Use the narrow installed development workflow after project and environment routing."),
     ("product_strategy", "founder CEO product strategy engineering review design review product planning 创始人 产品策略 CEO 评审 工程评审 设计评审", "installed-product-strategy-workflow", "documents", "Ask before installing a missing strategy workflow.", "Keep remote writes separately authorized."),
@@ -276,7 +276,7 @@ def category_from_text(text: str) -> str:
         ("openai_docs", ["openai", "codex", "gpt", "api"]),
         ("coding_debug", ["debug", "build", "test", "shell", "script", "code", "调试", "代码"]),
         ("research_verification", ["version", "dependency", "install", "api", "兼容", "版本"]),
-        ("skill_evolution", ["skill", "plugin", "evolution", "remember", "进化", "插件"]),
+        ("skill_evolution", ["skill", "plugin", "evolution", "remember", "技能演化", "插件"]),
     ]
     for category, needles in checks:
         if any(has_term(needle) for needle in needles):

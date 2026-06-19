@@ -1,16 +1,16 @@
 ---
 name: skill-evolution-core
-description: Overall workflow for evolving and absorbing Codex skills. Use when the user asks to create, update, refactor, split, merge, validate, improve, or absorb skills; convert repeated mistakes into durable failure shields; consolidate project rules; design a personal skill system; learn personal trigger words; decide where knowledge belongs; when the user types "进化" as a forced shortcut for total skill evolution; or when the user types "吞噬" to install and integrate a selected Skill, plugin, tool, app, file, or mature capability with global dependency closure, overlap removal, light-rule absorption, heavy-workflow routing, validation, and reporting.
+description: Overall workflow for evolving and absorbing Codex skills. Use when the user asks to create, update, refactor, split, merge, validate, improve, or absorb skills; convert repeated mistakes into durable failure shields; consolidate project rules; design a personal skill system; learn personal trigger words; decide where knowledge belongs; when the local entry routes the configured evolution shortcut; or when it routes the configured absorption shortcut to install and integrate a selected Skill, plugin, tool, app, file, or mature capability with global dependency closure, overlap removal, light-rule absorption, heavy-workflow routing, validation, and reporting.
 ---
 
 # Skill Evolution Core
 
 Use this skill as the high-level workflow for improving the user's Codex skill system. Keep it focused on how skills evolve; use `skill-evolution-router` to classify where each rule or lesson belongs.
 
-## Forced Shortcuts
+## Configured Shortcuts
 
-- When the user enters `进化` at the end of a conversation or after a task, run the total skill-evolution workflow. Review the preceding conversation for durable rules, repeated failures, semantic capture markers, and skill-routing updates before editing any skill.
-- When the user enters `吞噬`, run the complete capability-absorption workflow in `references/capability-absorption.md`. Look back at the immediately preceding context to identify the target; if clear, do not ask the user to repeat it.
+- When the local entry routes the configured evolution shortcut at the end of a conversation or after a task, run the total skill-evolution workflow. Review the preceding conversation for durable rules, repeated failures, semantic capture markers, and skill-routing updates before editing any skill.
+- When the local entry routes the configured absorption shortcut, run the complete capability-absorption workflow in `references/capability-absorption.md`. Look back at the immediately preceding context to identify the target; if clear, do not ask the user to repeat it.
 
 Run the trigger-learning pass in `references/trigger-learning.md` before promoting new trigger words. Record only sanitized evidence in `references/trigger-candidates.md`.
 
@@ -23,8 +23,8 @@ Run the trigger-learning pass in `references/trigger-learning.md` before promoti
    - promote a lesson from a task
    - reduce bloat or duplication
    - validate trigger behavior
-   - forced `进化` shortcut from the end of a conversation
-   - forced `吞噬` shortcut for capability ingestion
+   - configured evolution shortcut from the end of a conversation
+   - configured absorption shortcut for capability ingestion
    - repeated personal usage pattern that may deserve a new trigger word
 
 2. Collect the minimum evidence:
@@ -61,7 +61,7 @@ Run the trigger-learning pass in `references/trigger-learning.md` before promoti
 
 ## Architecture Rules
 
-- Use one small forced entry point when the user wants reliability, then route to narrower skills.
+- Use one small local entry point for configured shortcuts, then route to narrower skills.
 - Put reusable installed-plugin, installed-skill, app, MCP, and candidate-plugin selection logic in `codex-capability-router`; this skill should only manage how that routing skill evolves.
 - Do not build a giant all-purpose `SKILL.md`; it will be fully loaded whenever selected.
 - Use references to approximate "load only the needed part" within a skill.

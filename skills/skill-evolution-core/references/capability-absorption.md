@@ -2,9 +2,9 @@
 
 Use this process when a mature external skill overlaps the user's existing skill system.
 
-## Forced Trigger
+## Configured Trigger
 
-- Treat `吞噬` as explicit authorization to install and locally integrate the target identified in the immediately preceding context, including its ordinary required global dependencies.
+- Treat the configured absorption shortcut as explicit authorization to install and locally integrate the target identified in the immediately preceding context, including its ordinary required global dependencies.
 - If the target is clear, proceed without asking the user to repeat it. If no target can be identified, ask one concise question naming the missing target.
 - The shortcut does not authorize login, cookie import, remote publishing, commit, push, merge, deployment, paid purchases, or other materially separate external effects.
 
@@ -32,7 +32,7 @@ Do not paste a complete upstream workflow into an evolution skill. The upstream 
 
 ## Current Ownership Boundaries
 
-- `skill-evolution-core` and `skill-evolution-router` exclusively own durable rule capture and skill mutation; `skill-evolution-core` also owns the forced `进化` and `吞噬` shortcuts.
+- `skill-evolution-core` and `skill-evolution-router` exclusively own durable rule capture and skill mutation; the local entry owns the chosen shortcut aliases and routes both workflows to `skill-evolution-core`.
 - `codex-capability-router` owns automatic selection of installed mature skills.
 - `coding-debug-rules` owns first-pass local environment and failure triage; specialist debugging skills may take over after that evidence pass.
 - Product Design `get-context` owns the design brief gate; visual-style skills refine the selected direction afterward.

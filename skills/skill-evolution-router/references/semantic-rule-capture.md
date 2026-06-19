@@ -10,11 +10,11 @@ Treat these as likely durable-rule intent when scope is clear:
 - "必须", "不要", "禁止", "优先", "先 X 后 Y", "只要 X 就 Y"
 - "规则", "标准", "流程", "原则", "习惯", "记住", "保存", "沉淀"
 - "增加规则", "写进 skill", "加入 skill", "加到项目规则"
-- "进化" when it appears at the end of a conversation or after a task
+- the locally configured evolution shortcut when it appears at the end of a conversation or after a task
 
 When the user only says "增加规则" or similar, inspect the immediately preceding user request and the latest relevant failure/self-check. Extract the durable semantic rule from that context.
 
-When the user only says "进化" after a task, run `skill-evolution-core` first, then use this router to decide which durable lessons should be promoted.
+When the user only enters the configured evolution shortcut after a task, run `skill-evolution-core` first, then use this router to decide which durable lessons should be promoted.
 
 ## Capture Decision
 

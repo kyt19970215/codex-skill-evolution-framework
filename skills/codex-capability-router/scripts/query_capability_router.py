@@ -32,7 +32,7 @@ CATEGORY_KEYWORDS = {
     "openai_docs": ["openai", "codex", "gpt", "api", "model", "官方文档"],
     "coding_debug": ["debug", "build", "test", "script", "shell", "path", "encoding", "代码", "调试", "构建", "测试"],
     "research_verification": ["version", "dependency", "install", "upgrade", "compatibility", "public tool", "版本", "依赖", "安装", "兼容"],
-    "skill_evolution": ["skill", "plugin", "evolution", "absorb skill", "absorb capability", "remember", "route rule", "进化", "吞噬", "插件", "技能", "规则"],
+    "skill_evolution": ["skill", "plugin", "evolution", "absorb skill", "absorb capability", "remember", "route rule", "技能演化", "能力吸收", "插件", "技能", "规则"],
     "content_visuals": ["article illustration", "illustrate article", "cover image", "infographic", "visual summary", "为文章配图", "文章配图", "封面图", "信息图", "高密度信息大图"],
     "software_workflow": ["requirements", "brainstorming", "implementation plan", "tdd", "parallel agents", "code review", "verification", "需求梳理", "实施计划", "测试驱动", "并行开发", "代码审查", "完成前验证"],
     "product_strategy": ["founder", "ceo review", "product strategy", "engineering review", "design review", "创始人", "产品策略", "ceo 评审", "工程评审", "设计评审"],

@@ -52,7 +52,7 @@ Merge or keep together when:
 ## Trigger Learning
 
 - Treat repeated forced skill use as evidence that the user's natural language may need a new trigger.
-- Count normalized trigger candidates across forced `进化` runs, not raw full prompts.
+- Count normalized trigger candidates across runs invoked by the configured evolution shortcut, not raw full prompts.
 - Three similar occurrences are enough to propose promotion; automatic promotion is allowed only for low-risk, narrow-scope trigger rules.
 - Ask before promoting triggers that affect destructive actions, safety, account risk, external publishing, broad always-on behavior, or unclear project scope.
 - Prefer specific trigger patterns over broad keywords that would make skills fire too often.
