@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.sqlite
+*.sqlite3
+*.db
+.venv/
+.env
+.env.*
+private/
+secrets.*
+skills/codex-capability-router/data/

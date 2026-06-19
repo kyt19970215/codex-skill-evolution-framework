@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Verification"
+  short_description: "Reusable research, version-checking, and source-failure rules"
+  default_prompt: "Use $research-verification to verify this claim and capture any reusable source or version lesson."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Capability Router"
+  short_description: "Route tasks to installed skills and plugin candidates."
+  default_prompt: "Use $codex-capability-router to choose the best installed Codex skills, plugins, apps, or candidate plugins for this task."

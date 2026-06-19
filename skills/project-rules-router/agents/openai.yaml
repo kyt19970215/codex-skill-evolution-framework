@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Rules Router"
+  short_description: "Route project work to rules, skills, and capabilities."
+  default_prompt: "Use $project-rules-router to identify project rules, relevant Codex capabilities, and durable-rule routing before starting non-trivial work."

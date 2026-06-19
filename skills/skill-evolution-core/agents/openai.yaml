@@ -1,0 +1,4 @@
+interface:
+  display_name: "进化与吞噬"
+  short_description: "进化个人 Skill，并吞噬成熟能力、全局依赖与路由规则"
+  default_prompt: "Use $skill-evolution-core to 进化当前规则，或吞噬前文选定的能力并完成全局依赖、去重、路由与验证。"

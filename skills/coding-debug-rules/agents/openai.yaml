@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coding Debug Rules"
+  short_description: "Reusable coding, shell, debugging, and failure-learning rules"
+  default_prompt: "Use $coding-debug-rules to debug this technical problem and classify any reusable failure lesson."

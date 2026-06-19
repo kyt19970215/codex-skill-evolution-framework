@@ -1,0 +1,4 @@
+interface:
+  display_name: "Example Project"
+  short_description: "Template project skill"
+  default_prompt: "Use $example-project after renaming it for this project."
