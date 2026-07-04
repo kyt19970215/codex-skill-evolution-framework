@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / "skills"
 TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".py", ".json", ".txt"}
 FORBIDDEN_SUFFIXES = {".sqlite", ".sqlite3", ".db", ".pyc", ".zip"}
+IGNORED_DIRECTORIES = {".git", ".worktrees", "__pycache__", ".venv", ".pytest_cache", ".mypy_cache"}
 NAME_RE = re.compile(r"^[a-z0-9-]{1,63}$")
 REFERENCE_RE = re.compile(
     r"(?<![A-Za-z0-9_/-])((?:references|scripts|assets)/[A-Za-z0-9._/-]+\.(?:md|py|yaml|yml|json))"
@@ -124,7 +125,7 @@ def validate_files(errors: list[str]) -> tuple[int, int]:
     text_count = 0
     script_count = 0
     for path in sorted(ROOT.rglob("*")):
-        if not path.is_file() or ".git" in path.parts or "__pycache__" in path.parts:
+        if not path.is_file() or any(part in IGNORED_DIRECTORIES for part in path.parts):
             continue
         relative = path.relative_to(ROOT)
         if path.suffix.lower() in FORBIDDEN_SUFFIXES:

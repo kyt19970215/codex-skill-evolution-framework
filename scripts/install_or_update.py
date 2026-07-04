@@ -25,6 +25,7 @@ PENDING_DIRECTORY = ".skill-evolution-updates"
 PROTECTED_FILES = frozenset(
     {
         "skills/skill-evolution-core/references/trigger-candidates.md",
+        "skills/skill-evolution-core/references/devolution-ledger.md",
         "skills/codex-capability-router/references/external-skill-registry.md",
     }
 )

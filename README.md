@@ -6,7 +6,7 @@ A reusable, privacy-clean framework for growing a Codex skill system without tur
 
 It keeps six concerns separate:
 
-1. `skill-evolution-core` — create, update, split, merge, validate, and absorb skills.
+1. `skill-evolution-core` — create, update, split, merge, validate, absorb, and maintain skills.
 2. `skill-evolution-router` — decide where durable rules and lessons belong.
 3. `project-rules-router` — select project-specific guidance before non-trivial work.
 4. `coding-debug-rules` — triage local environment, shell, encoding, path, dependency, build, and test failures.
@@ -15,11 +15,13 @@ It keeps six concerns separate:
 
 Shortcut aliases are local configuration. On first installation, each user chooses one shortcut for a full evolution pass and another for capability absorption. The public framework does not impose personal trigger words.
 
+The framework also includes an optional global guidance template at `templates/global-agents-template/AGENTS.md`. It is a privacy-clean starting point for response style, confirmation rhythm, rule layering, verification habits, file safety, and evolution routing. It is not installed automatically because a filled global `AGENTS.md` is personal configuration.
+
 ## Privacy Model
 
 This repository contains no real trigger evidence, generated capability inventory, local absolute paths, account data, private project names, logs, screenshots, conversation transcripts, or project-specific source lists.
 
-`skills/codex-capability-router/data/` is generated locally and ignored by Git. `trigger-candidates.md` is an empty ledger template. `external-skill-registry.md` is a neutral configuration template.
+`skills/codex-capability-router/data/` is generated locally and ignored by Git. `trigger-candidates.md` and `devolution-ledger.md` are empty local ledger templates. `external-skill-registry.md` is a neutral configuration template.
 
 ## Install Or Update
 
@@ -67,9 +69,10 @@ python ~/.codex/skills/codex-capability-router/scripts/refresh_plugin_candidates
 ## Customize Safely
 
 - Put always-on personal preferences in global guidance rather than publishing them inside a skill.
+- Use `templates/global-agents-template/AGENTS.md` as a starting point for private global guidance, then replace placeholders locally.
 - Put repository commands and conventions in the repository's `AGENTS.md`.
 - Copy `templates/project-skill-template/` for private project knowledge.
-- Keep `skill-evolution-entry/`, `trigger-candidates.md`, and `external-skill-registry.md` local; the updater never overwrites them.
+- Keep `skill-evolution-entry/`, `trigger-candidates.md`, `devolution-ledger.md`, and `external-skill-registry.md` local; the updater never overwrites them.
 - Keep real trigger evidence and local capability inventories private.
 - Run the validator and [privacy checklist](docs/privacy-checklist.md) before publishing a customized fork.
 

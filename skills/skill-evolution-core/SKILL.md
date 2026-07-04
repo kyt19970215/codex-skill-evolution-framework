@@ -1,6 +1,6 @@
 ---
 name: skill-evolution-core
-description: Overall workflow for evolving and absorbing Codex skills. Use when the user asks to create, update, refactor, split, merge, validate, improve, or absorb skills; convert repeated mistakes into durable failure shields; consolidate project rules; design a personal skill system; learn personal trigger words; decide where knowledge belongs; when the local entry routes the configured evolution shortcut; or when it routes the configured absorption shortcut to install and integrate a selected Skill, plugin, tool, app, file, or mature capability with global dependency closure, overlap removal, light-rule absorption, heavy-workflow routing, validation, and reporting.
+description: Overall workflow for evolving, absorbing, and maintaining Codex skills. Use when the user asks to create, update, refactor, split, merge, validate, improve, relax, prune, degrade, or absorb skills; convert repeated mistakes into durable failure shields; consolidate project rules; design a personal skill system; learn personal trigger words; decide where knowledge belongs; when the local entry routes the configured evolution shortcut; or when it routes the configured absorption shortcut to install and integrate a selected Skill, plugin, tool, app, file, or mature capability with global dependency closure, overlap removal, light-rule absorption, heavy-workflow routing, validation, and reporting.
 ---
 
 # Skill Evolution Core
@@ -11,6 +11,7 @@ Use this skill as the high-level workflow for improving the user's Codex skill s
 
 - When the local entry routes the configured evolution shortcut at the end of a conversation or after a task, run the total skill-evolution workflow. Review the preceding conversation for durable rules, repeated failures, semantic capture markers, and skill-routing updates before editing any skill.
 - When the local entry routes the configured absorption shortcut, run the complete capability-absorption workflow in `references/capability-absorption.md`. Look back at the immediately preceding context to identify the target; if clear, do not ask the user to repeat it.
+- When the user asks to relax, prune, merge, downgrade, archive, or remove bloated or over-narrow rules, run the devolution workflow in `references/devolution.md`.
 
 Run the trigger-learning pass in `references/trigger-learning.md` before promoting new trigger words. Record only sanitized evidence in `references/trigger-candidates.md`.
 
@@ -25,6 +26,7 @@ Run the trigger-learning pass in `references/trigger-learning.md` before promoti
    - validate trigger behavior
    - configured evolution shortcut from the end of a conversation
    - configured absorption shortcut for capability ingestion
+   - devolution or rule-maintenance request
    - repeated personal usage pattern that may deserve a new trigger word
 
 2. Collect the minimum evidence:
@@ -33,6 +35,7 @@ Run the trigger-learning pass in `references/trigger-learning.md` before promoti
    - near-miss symptom or anomalous output that was dismissed as harmless
    - affected skill paths
    - whether the rule is global, type-specific, or project-specific
+   - whether the rule is hard safety, soft preference, scoped guidance, or only a historical example
    - repeated trigger words, user phrasing, and chosen routing outcome
    - whether the rule is about capability discovery, installed plugin/skill routing, candidate plugin suggestions, or actual skill evolution
    - current `SKILL.md`, relevant references, and `agents/openai.yaml`
@@ -42,12 +45,16 @@ Run the trigger-learning pass in `references/trigger-learning.md` before promoti
    - Prefer the narrowest durable home.
    - Split general guardrails from project-specific examples.
    - When an upstream skill overlaps existing rules, use `references/capability-absorption.md` to choose absorption, delegation, or replacement before copying anything.
+   - Before adding narrow hard constraints, run the anti-narrowing check in `references/devolution.md`.
+   - For lifecycle thresholds, use `references/rule-lifecycle.md`.
 
 4. Edit with progressive disclosure:
    - Keep `SKILL.md` small and trigger-focused.
    - Put detailed matrices, examples, failure shields, source lists, and project maps in `references/`.
    - Put deterministic repeated code in `scripts/`.
    - Avoid README, changelog, installation guide, or other nonessential files inside skills.
+   - For devolution, prefer relaxing, scoping, merging, or downgrading a rule before deleting it outright.
+   - Record devolution decisions in `references/devolution-ledger.md` when a rule is promoted, relaxed, scoped, downgraded, archived, or removed.
 
 5. Validate:
    - Run the skill validator after creating or structurally editing a skill.
@@ -68,6 +75,7 @@ Run the trigger-learning pass in `references/trigger-learning.md` before promoti
 - Use separate skills when trigger conditions differ meaningfully.
 - Put always-on personal behavior in global guidance or AGENTS.md, not in a rarely triggered skill.
 - Keep mature third-party workflows independently updateable. Absorb only compact, durable principles; route heavy execution through `codex-capability-router`.
+- Treat devolution as maintenance, not failure: it keeps skills useful by reducing bloat and turning over-specific patches back into scoped guidance.
 
 ## References
 
@@ -76,3 +84,6 @@ Run the trigger-learning pass in `references/trigger-learning.md` before promoti
 - `references/trigger-learning.md`: learn personal trigger words from repeated forced evolution runs.
 - `references/trigger-candidates.md`: sanitized counter ledger for candidate trigger words.
 - `references/capability-absorption.md`: deduplicate upstream skills and route mature heavy workflows.
+- `references/devolution.md`: relax, prune, merge, downgrade, archive, or remove bloated and over-narrow rules.
+- `references/rule-lifecycle.md`: lifecycle states and thresholds for promotion, devolution review, downgrade, archive, and removal.
+- `references/devolution-ledger.md`: sanitized local ledger for rule lifecycle and devolution decisions.
