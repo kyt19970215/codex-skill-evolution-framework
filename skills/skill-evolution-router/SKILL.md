@@ -1,6 +1,6 @@
 ---
 name: skill-evolution-router
-description: Classification and routing workflow for reusable Codex rules, lessons, failure shields, source priorities, trigger-word learning, and project knowledge. Use when the user asks to save, remember, add, classify, split, promote, or organize a rule; when they mention skill evolution, use the locally configured evolution shortcut, compare global vs project rules, capture reusable lessons or failure learning, identify personal trigger words, or decide where a piece of knowledge should live; or before editing skills from a newly discovered durable lesson.
+description: Classification and routing workflow for reusable Codex rules, lessons, failure shields, source priorities, trigger-word learning, project knowledge, and rule maintenance. Use when the user asks to save, remember, add, classify, split, promote, relax, prune, merge, downgrade, or organize a rule; when they mention skill evolution, use the locally configured evolution shortcut, compare global vs project rules, capture reusable lessons or failure learning, identify personal trigger words, over-narrow rules, or decide where a piece of knowledge should live; or before editing skills from a newly discovered durable lesson.
 ---
 
 # Skill Evolution Router
@@ -17,6 +17,7 @@ Use this skill to decide where durable knowledge belongs before editing any skil
    - failure lesson
    - personal trigger candidate
    - skill architecture decision
+   - devolution candidate: a rule that may need pruning, relaxation, merging, scoping, or downgrading
 
 2. Determine scope:
    - one-off task
@@ -33,13 +34,15 @@ Use this skill to decide where durable knowledge belongs before editing any skil
 
 5. If the rule comes from repeated use of the configured evolution shortcut, use `skill-evolution-core/references/trigger-learning.md` before promotion.
 
-6. Edit only the narrowest durable home:
+6. If the rule may be over-narrow, bloated, stale, duplicated, or blocking progress, use `skill-evolution-core/references/devolution.md` before editing.
+
+7. Edit only the narrowest durable home:
    - global type skill for reusable process
    - project skill for project facts and project-specific habits
    - project `AGENTS.md` for repo commands and repo conventions
    - global guidance only for always-on behavior
 
-7. Keep the entry compact:
+8. Keep the entry compact:
    - rule
    - scope
    - evidence or rationale

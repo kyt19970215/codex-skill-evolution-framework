@@ -45,6 +45,15 @@ class InstallOrUpdateTests(unittest.TestCase):
         trigger_candidates.parent.mkdir(parents=True, exist_ok=True)
         trigger_candidates.write_text(f"upstream trigger template {version}\n", encoding="utf-8")
 
+        devolution_ledger = (
+            self.source
+            / "skills"
+            / "skill-evolution-core"
+            / "references"
+            / "devolution-ledger.md"
+        )
+        devolution_ledger.write_text(f"upstream devolution ledger {version}\n", encoding="utf-8")
+
         registry = (
             self.source
             / "skills"
@@ -187,8 +196,16 @@ class InstallOrUpdateTests(unittest.TestCase):
             / "references"
             / "external-skill-registry.md"
         )
+        devolution_ledger = (
+            self.codex_home
+            / "skills"
+            / "skill-evolution-core"
+            / "references"
+            / "devolution-ledger.md"
+        )
         trigger_candidates.write_text("my trigger history\n", encoding="utf-8")
         registry.write_text("my installed capabilities\n", encoding="utf-8")
+        devolution_ledger.write_text("my devolution decisions\n", encoding="utf-8")
         self._write_source("v2")
 
         result = install_or_update(
@@ -199,8 +216,15 @@ class InstallOrUpdateTests(unittest.TestCase):
 
         self.assertEqual(trigger_candidates.read_text(encoding="utf-8"), "my trigger history\n")
         self.assertEqual(registry.read_text(encoding="utf-8"), "my installed capabilities\n")
+        self.assertEqual(
+            devolution_ledger.read_text(encoding="utf-8"), "my devolution decisions\n"
+        )
         self.assertIn(
             "skills/skill-evolution-core/references/trigger-candidates.md",
+            result.preserved,
+        )
+        self.assertIn(
+            "skills/skill-evolution-core/references/devolution-ledger.md",
             result.preserved,
         )
         self.assertIn(
@@ -233,6 +257,31 @@ class InstallOrUpdateTests(unittest.TestCase):
                     text = path.read_text(encoding="utf-8")
                     self.assertNotIn("进化", text, path)
                     self.assertNotIn("吞噬", text, path)
+                    self.assertNotIn("退化", text, path)
+
+    def test_global_agents_template_uses_placeholders_not_private_details(self) -> None:
+        template = (
+            Path(__file__).resolve().parents[1]
+            / "templates"
+            / "global-agents-template"
+            / "AGENTS.md"
+        )
+        text = template.read_text(encoding="utf-8")
+        self.assertIn("<EVOLUTION_SHORTCUT>", text)
+        self.assertIn("<ABSORPTION_SHORTCUT>", text)
+        self.assertIn("<RULE_MAINTENANCE_SHORTCUT>", text)
+        forbidden = [
+            "C:" + "\\Users" + "\\",
+            "G:" + "\\",
+            "D" + "NF",
+            "293" + "297533",
+            "kyt" + "19970215",
+            "进化",
+            "吞噬",
+            "退化",
+        ]
+        for value in forbidden:
+            self.assertNotIn(value, text)
 
     def test_legacy_install_without_manifest_preserves_existing_files(self) -> None:
         existing = self.codex_home / "skills" / "coding-debug-rules" / "SKILL.md"

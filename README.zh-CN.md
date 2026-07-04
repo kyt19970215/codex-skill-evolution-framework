@@ -6,7 +6,7 @@
 
 完整框架包含六个独立 Skill：
 
-1. `skill-evolution-core`：创建、更新、拆分、合并、验证和吸收 Skill。
+1. `skill-evolution-core`：创建、更新、拆分、合并、验证、吸收和维护 Skill。
 2. `skill-evolution-router`：判断长期规则和经验应该保存在哪里。
 3. `project-rules-router`：处理非简单项目任务前选择对应的项目规则。
 4. `coding-debug-rules`：排查 Shell、编码、路径、依赖、构建和测试问题。
@@ -15,11 +15,13 @@
 
 快捷触发词属于每位使用者自己的本地配置。首次安装时，使用者分别选择一个完整进化入口和一个能力吸收入口；公开框架不预设个人触发词。
 
+框架还包含一个可选的全局规则模板：`templates/global-agents-template/AGENTS.md`。它提供回答风格、确认节奏、四层规则、验证习惯、文件安全和 Skill 演化路由的干净起点。模板不会自动安装，因为填好的全局 `AGENTS.md` 属于个人配置。
+
 ## 隐私边界
 
 公开仓库不包含真实触发记录、本机能力数据库、绝对路径、账号资料、私有项目名、日志、截图、对话记录或项目专用来源。
 
-`trigger-candidates.md` 和 `external-skill-registry.md` 都是空白模板；能力数据库只在使用者本机生成，并已被 Git 忽略。
+`trigger-candidates.md`、`devolution-ledger.md` 和 `external-skill-registry.md` 都是空白模板；能力数据库只在使用者本机生成，并已被 Git 忽略。
 
 ## 安装或更新
 
@@ -52,9 +54,10 @@ python scripts/validate_framework.py
 ## 安全定制
 
 - 长期个人偏好放入个人全局规则，不要提交到公开 Skill。
+- 可以从 `templates/global-agents-template/AGENTS.md` 开始建立私有全局规则，但要在本地替换占位符。
 - 仓库命令和约定放入该仓库的 `AGENTS.md`。
 - 使用 `templates/project-skill-template/` 创建私有项目 Skill。
-- `skill-evolution-entry/`、`trigger-candidates.md` 和 `external-skill-registry.md` 属于本地个人数据，更新器永不覆盖。
+- `skill-evolution-entry/`、`trigger-candidates.md`、`devolution-ledger.md` 和 `external-skill-registry.md` 属于本地个人数据，更新器永不覆盖。
 - 真实触发记录和本机能力数据库始终保持私有。
 - 公开定制版本前重新运行验证器和[隐私检查表](docs/privacy-checklist.md)。
 
