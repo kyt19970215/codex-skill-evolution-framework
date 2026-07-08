@@ -17,11 +17,13 @@
 
 框架还包含一个可选的全局规则模板：`templates/global-agents-template/AGENTS.md`。它提供回答风格、确认节奏、四层规则、验证习惯、文件安全和 Skill 演化路由的干净起点。模板不会自动安装，因为填好的全局 `AGENTS.md` 属于个人配置。
 
+Skill 演化现在支持按轻重分级处理，也加入了“先观察、再建议”的被动触发探针。探针可以记录或建议可能路由，但不会自动执行工作流、改文件、安装工具、提交、推送、发布或操作账号。
+
 ## 隐私边界
 
 公开仓库不包含真实触发记录、本机能力数据库、绝对路径、账号资料、私有项目名、日志、截图、对话记录或项目专用来源。
 
-`trigger-candidates.md`、`devolution-ledger.md` 和 `external-skill-registry.md` 都是空白模板；能力数据库只在使用者本机生成，并已被 Git 忽略。
+`trigger-candidates.md`、`devolution-ledger.md` 和 `external-skill-registry.md` 都是空白模板；能力数据库和被动触发事件日志只在使用者本机生成，并已被 Git 忽略。
 
 ## 安装或更新
 
@@ -58,6 +60,7 @@ python scripts/validate_framework.py
 - 仓库命令和约定放入该仓库的 `AGENTS.md`。
 - 使用 `templates/project-skill-template/` 创建私有项目 Skill。
 - `skill-evolution-entry/`、`trigger-candidates.md`、`devolution-ledger.md` 和 `external-skill-registry.md` 属于本地个人数据，更新器永不覆盖。
+- 被动触发事件日志也只保留在本地，即使已做脱敏，也不要提交。
 - 真实触发记录和本机能力数据库始终保持私有。
 - 公开定制版本前重新运行验证器和[隐私检查表](docs/privacy-checklist.md)。
 

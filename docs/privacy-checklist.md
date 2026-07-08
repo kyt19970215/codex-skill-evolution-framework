@@ -11,6 +11,7 @@ Run this checklist before publishing or pushing a customized copy.
 - Real trigger-learning evidence that reveals user behavior or private work.
 - Filled personal `AGENTS.md` files; publish only templates with placeholders.
 - Filled rule-maintenance ledgers such as `devolution-ledger.md`.
+- Passive trigger event logs, even when sanitized.
 - Project-specific source lists and unverified claims presented as facts.
 
 ## Sanitize
@@ -20,6 +21,7 @@ Run this checklist before publishing or pushing a customized copy.
 - Replace source lists with source categories.
 - Replace real trigger ledgers and external-skill registries with empty templates.
 - Replace personal shortcut words in shareable guidance with placeholders such as `<EVOLUTION_SHORTCUT>`.
+- Replace passive trigger examples with synthetic phrases and keep JSONL event logs out of Git.
 - Keep public skills focused on reusable process.
 
 ## Verify

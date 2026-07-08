@@ -19,16 +19,39 @@ Classify each overlapping part:
 
 Do not paste a complete upstream workflow into an evolution skill. The upstream package remains the source of truth; the local system owns only trigger routing, precedence, safety boundaries, and concise reusable lessons.
 
+Absorption must include a lightweight devolution/reconciliation pass:
+
+- Merge useful overlap into the existing owner paragraph or bullet instead of appending a parallel section.
+- Remove or rewrite a superseded duplicate only after confirming the original intent is still preserved.
+- Treat replacement, downgrade, or trigger-strength reduction as a behavior change unless tests and the user confirm it should change.
+- Escalate to the full devolution workflow only when overlap, conflict, bloat, or progress blockage is real; do not turn every absorption into a heavy cleanup.
+
+## Post-Install Discovery Rule
+
+After installing, enabling, or updating the selected capability, rerun discovery from the actual installed state before editing durable routing or skill behavior. This is part of the same absorption run; do not ask the user to trigger absorption again.
+
+Capture only the evidence needed for correct routing:
+
+- actual executable, skill, plugin, MCP, app, or hook identifiers
+- version, path, PATH or registry visibility, and clean-shell discovery
+- help output, schema, manifest, metadata, commands, supported formats, and required environment variables
+- first-run warnings, missing optional dependencies, permission prompts, or unavailable subfeatures
+- minimal real invocation or load result, using nonsensitive sample data when possible
+
+If installed behavior differs from the pre-install assumption, prefer verified installed behavior. Do not write or keep routing that points to an unusable command, stale capability name, missing app, unavailable plugin, or unverified cloud/remote feature. Record unresolved subfeatures as residual risk instead of presenting the capability as fully absorbed.
+
 ## Integration Workflow
 
 1. Resolve the target's canonical name, official source, current version or revision, license, trust level, supported hosts, permissions, external effects, update method, and required runtime chain.
 2. Verify public capabilities against official documentation, releases, repository files, and current local evidence. Treat videos and community summaries as discovery leads.
 3. Install the selected target and its complete ordinary global dependency closure under the rule below.
-4. Compare it with `AGENTS.md`, project rules, global reusable skills, and the capability registry; classify each overlap as absorb, delegate, replace, or ignore.
-5. Extract only principles that remain useful after removing the upstream name. Keep mature scripts, templates, role workflows, and large instructions independently updateable.
-6. Add task-to-skill routing, precedence, compatibility adapters, and external-effect boundaries to `codex-capability-router`.
-7. Keep lasting personal rule edits under `skill-evolution-core` and `skill-evolution-router`; upstream learn or skillify functions may produce proposals only.
-8. Validate changed local skills, UI metadata, clean-shell dependency discovery, imports or loads, a minimal real invocation, and representative routing queries. Report installed, absorbed, delegated, replaced, ignored, routed, verified, and unresolved parts.
+4. Rerun post-install discovery from the actual installed state before writing durable routing or skill behavior.
+5. Compare the verified installed capability with `AGENTS.md`, project rules, global reusable skills, and the capability registry; classify each overlap as absorb, delegate, replace, or ignore.
+6. Run the lightweight reconciliation pass: merge absorbed principles into the current owner text, identify obsolete duplicates, and preserve final semantics unless the user approved a behavior change.
+7. Extract only principles that remain useful after removing the upstream name. Keep mature scripts, templates, role workflows, and large instructions independently updateable.
+8. Add task-to-skill routing, precedence, compatibility adapters, and external-effect boundaries to `codex-capability-router`.
+9. Keep lasting personal rule edits under `skill-evolution-core` and `skill-evolution-router`; upstream learn or skillify functions may produce proposals only.
+10. Validate changed local skills, UI metadata, clean-shell dependency discovery, imports or loads, a minimal real invocation, representative routing queries, and any semantic/effect-preservation claim. Report installed, post-install discovered, absorbed, delegated, replaced, ignored, routed, verified, and unresolved parts.
 
 ## Current Ownership Boundaries
 

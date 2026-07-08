@@ -17,11 +17,13 @@ Shortcut aliases are local configuration. On first installation, each user choos
 
 The framework also includes an optional global guidance template at `templates/global-agents-template/AGENTS.md`. It is a privacy-clean starting point for response style, confirmation rhythm, rule layering, verification habits, file safety, and evolution routing. It is not installed automatically because a filled global `AGENTS.md` is personal configuration.
 
+Skill evolution now supports proportional load levels and observation-first passive trigger probes. The probe can record or suggest likely routes, but it does not execute workflows, edit files, install tools, commit, push, publish, or perform account actions.
+
 ## Privacy Model
 
 This repository contains no real trigger evidence, generated capability inventory, local absolute paths, account data, private project names, logs, screenshots, conversation transcripts, or project-specific source lists.
 
-`skills/codex-capability-router/data/` is generated locally and ignored by Git. `trigger-candidates.md` and `devolution-ledger.md` are empty local ledger templates. `external-skill-registry.md` is a neutral configuration template.
+`skills/codex-capability-router/data/` is generated locally and ignored by Git. `trigger-candidates.md` and `devolution-ledger.md` are empty local ledger templates. Passive trigger event logs are local JSONL files and ignored by Git. `external-skill-registry.md` is a neutral configuration template.
 
 ## Install Or Update
 
@@ -73,6 +75,7 @@ python ~/.codex/skills/codex-capability-router/scripts/refresh_plugin_candidates
 - Put repository commands and conventions in the repository's `AGENTS.md`.
 - Copy `templates/project-skill-template/` for private project knowledge.
 - Keep `skill-evolution-entry/`, `trigger-candidates.md`, `devolution-ledger.md`, and `external-skill-registry.md` local; the updater never overwrites them.
+- Keep passive trigger event logs local; they may contain behavior signals even when sanitized.
 - Keep real trigger evidence and local capability inventories private.
 - Run the validator and [privacy checklist](docs/privacy-checklist.md) before publishing a customized fork.
 

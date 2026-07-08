@@ -10,3 +10,4 @@ __pycache__/
 private/
 secrets.*
 skills/codex-capability-router/data/
+skills/skill-evolution-core/references/evolution-trigger-events.jsonl
