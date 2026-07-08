@@ -19,6 +19,8 @@ The discovery location does not fix the final scope. Audit project rules for a p
 - `references/` is for details loaded only when needed.
 - `scripts/` is for deterministic repeated operations.
 - Do not duplicate the same rule across multiple skills unless one entry is only a pointer.
+- When a new lesson overlaps existing guidance, merge it into the existing owner text instead of appending a parallel section.
+- Create a new heading only when the rule has a distinct trigger, owner, lifecycle, or validation path.
 
 ## Split Or Merge
 
@@ -42,6 +44,7 @@ Merge or keep together when:
 - For one failure, add a shield only after the root cause is clear.
 - For a near-miss, add a shield when the symptom is clear enough to prevent premature dismissal, even if the underlying tool behavior still needs a small local verification step.
 - Preserve the user's intended preference, but do not turn uncertain technical claims into facts.
+- When relaxing, downgrading, or splitting trigger levels, preserve the original semantics unless the user explicitly approves a behavior change.
 
 ## Near-Miss Capture
 
@@ -56,3 +59,11 @@ Merge or keep together when:
 - Three similar occurrences are enough to propose promotion; automatic promotion is allowed only for low-risk, narrow-scope trigger rules.
 - Ask before promoting triggers that affect destructive actions, safety, account risk, external publishing, broad always-on behavior, or unclear project scope.
 - Prefer specific trigger patterns over broad keywords that would make skills fire too often.
+
+## Passive Trigger Observation
+
+- Passive trigger systems should start as observation only: log, suggest, or request AI review.
+- Scripts may count signals, check recency, redact sensitive text, and return compact route hints.
+- AI remains responsible for deciding whether to use the hint in the current conversation until the trigger is promoted.
+- Promote passive triggers to automatic light execution only after enough evidence, no high-impact false positives, validation, and explicit user approval.
+- Keep raw prompts, private project details, logs, account data, and secrets out of trigger ledgers.

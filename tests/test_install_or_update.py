@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -282,6 +284,72 @@ class InstallOrUpdateTests(unittest.TestCase):
         ]
         for value in forbidden:
             self.assertNotIn(value, text)
+
+    def test_passive_trigger_probe_is_observation_only(self) -> None:
+        script = (
+            Path(__file__).resolve().parents[1]
+            / "skills"
+            / "skill-evolution-core"
+            / "scripts"
+            / "passive_trigger_probe.py"
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(script),
+                "--text",
+                "Please debug this path and encoding error.",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["trigger_level"], "L1")
+        self.assertEqual(payload["suggested_route"], "coding-debug-rules")
+        self.assertFalse(payload["auto_action_allowed"])
+        self.assertTrue(payload["observation_phase"])
+
+    def test_passive_trigger_probe_reads_configured_shortcuts(self) -> None:
+        script = (
+            Path(__file__).resolve().parents[1]
+            / "skills"
+            / "skill-evolution-core"
+            / "scripts"
+            / "passive_trigger_probe.py"
+        )
+        manifest = self.root / "manifest.json"
+        manifest.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "triggers": {
+                        "evolution": "review-growth",
+                        "absorption": "absorb-tool",
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(script),
+                "--manifest",
+                str(manifest),
+                "--text",
+                "review-growth",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["trigger_level"], "L4")
+        self.assertEqual(payload["suggested_route"], "skill-evolution-core")
+        self.assertFalse(payload["auto_action_allowed"])
 
     def test_legacy_install_without_manifest_preserves_existing_files(self) -> None:
         existing = self.codex_home / "skills" / "coding-debug-rules" / "SKILL.md"

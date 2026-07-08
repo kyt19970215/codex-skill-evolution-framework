@@ -17,7 +17,7 @@ Use this table as a first-pass map. Prefer capabilities that are already install
 | coding_debug | code edit, shell, build, test, dependency, path, encoding, quoting | `coding-debug-rules` |
 | research_verification | public tool, current version, API behavior, exact public error | `research-verification` |
 | project_rules | named repository, product, game, or domain | `project-rules-router`, then the narrow matching project skill |
-| skill_evolution | create, update, split, merge, absorb, maintain, prune, or route skills and durable rules | `skill-evolution-core` plus `skill-evolution-router` |
+| skill_evolution | create, update, split, merge, absorb, maintain, observe triggers, prune, or route skills and durable rules | `skill-evolution-core` plus `skill-evolution-router` |
 | skill_discovery | no installed capability clearly matches | Discovery workflow; installation still requires explicit authorization |
 
 ## Ambiguous Tasks

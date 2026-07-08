@@ -7,7 +7,7 @@
 - `project-rules-router`: project work entry and project-skill discovery only; avoid putting detailed domain rules here.
 - `codex-capability-router`: reusable routing from task intent to installed Codex skills, plugins, apps, MCP tools, and safe candidate plugin suggestions.
 - `skill-evolution-core`: how to create, update, split, merge, validate, relax, prune, degrade, and keep skills lean.
-- `skill-evolution-router`: where rules, lessons, source priorities, trigger candidates, devolution candidates, and failure shields should live.
+- `skill-evolution-router`: where rules, lessons, source priorities, trigger candidates, passive trigger candidates, devolution candidates, and failure shields should live.
 - `coding-debug-rules`: shell, encoding, quoting, paths, local scripts, generated files, dependencies, build/test failures, and debugging guardrails that apply across projects.
 - `research-verification`: public source quality, current-version checks, APIs, dependencies, install/upgrade behavior, stale docs, exact public errors, and forum/source reliability.
 - Project skill such as `example-project`: project terms, source priorities, project paths, local commands, architecture choices, domain-specific known issues, and project-specific examples.
@@ -46,6 +46,13 @@ Keep local when any essential condition is project-only. Split the rule when onl
 - Three matching occurrences can promote the phrase to a trigger rule.
 - Count only same-intent and same-destination occurrences; do not count identical words used for different tasks.
 - Promote narrow triggers before broad ones.
+
+## Passive Trigger Handling
+
+- Passive trigger candidates start at observation levels L0-L2.
+- Use `skill-evolution-core/references/passive-trigger-observation.md` before promoting any passive candidate.
+- Scripts may suggest routes and count evidence, but AI remains the decision-maker until an L3 promotion is explicitly approved.
+- Never let passive triggers automatically edit files, install tools, commit, push, publish, or perform account actions.
 
 ## Devolution Candidate Handling
 
