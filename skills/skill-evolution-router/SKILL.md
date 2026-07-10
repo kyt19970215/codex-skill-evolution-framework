@@ -1,11 +1,13 @@
 ---
 name: skill-evolution-router
-description: Classification and routing workflow for reusable Codex rules, lessons, failure shields, source priorities, trigger-word learning, passive trigger observation, project knowledge, and rule maintenance. Use when the user asks to save, remember, add, classify, split, promote, relax, prune, merge, downgrade, or organize a rule; when they mention skill evolution, use the locally configured evolution shortcut, compare global vs project rules, capture reusable lessons or failure learning, identify personal trigger words, passive trigger candidates, over-narrow rules, or decide where a piece of knowledge should live; or before editing skills from a newly discovered durable lesson.
+description: Classify durable rules, reusable lessons, failure shields, trigger candidates, and project-to-global promotions before editing. Use for rule-placement and scope decisions; do not own configured shortcut execution or evolution-system audits.
 ---
 
 # Skill Evolution Router
 
 Use this skill to decide where durable knowledge belongs before editing any skill. It classifies; `skill-evolution-core` manages the overall update workflow.
+
+If the request is about the evolution system's health, cleanliness, behavior regression, local ledger, freshness, or release readiness rather than rule placement, route it to `skill-evolution-validator` instead.
 
 ## Routing Workflow
 

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "configured-evolution-shortcut",
+    "text": "{{evolution}}",
+    "expected_route": "skill-evolution-core",
+    "expected_level": "L4"
+  },
+  {
+    "id": "configured-absorption-shortcut",
+    "text": "{{absorption}}",
+    "expected_route": "skill-evolution-core",
+    "expected_level": "L4"
+  },
+  {
+    "id": "health-question",
+    "text": "Audit the evolution skill health, behavior regression, and freshness.",
+    "expected_route": "skill-evolution-validator",
+    "expected_level": "L4"
+  },
+  {
+    "id": "read-only-health-question",
+    "text": "Audit the evolution skill health, but do not modify files.",
+    "expected_route": "skill-evolution-validator",
+    "expected_level": "L4"
+  },
+  {
+    "id": "negated-shortcut",
+    "text": "Do not run {{evolution}}; discuss the idea only.",
+    "expected_route": "",
+    "expected_level": "L0"
+  },
+  {
+    "id": "discussion-only-evolution-wording",
+    "text": "Discuss product evolution, but do not modify any skill.",
+    "expected_route": "",
+    "expected_level": "L0"
+  },
+  {
+    "id": "durable-rule-capture",
+    "text": "Save this as a durable rule for future tasks.",
+    "expected_route": "skill-evolution-router",
+    "expected_level": "L1"
+  },
+  {
+    "id": "coding-failure",
+    "text": "The TypeScript build failed with a path encoding error.",
+    "expected_route": "coding-debug-rules",
+    "expected_level": "L1"
+  },
+  {
+    "id": "context-continuation",
+    "text": "Continue with the previous task.",
+    "context_route": "skill-evolution-router",
+    "expected_route": "skill-evolution-router",
+    "expected_level": "L1"
+  }
+]

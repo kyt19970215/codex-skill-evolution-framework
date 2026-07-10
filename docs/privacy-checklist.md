@@ -11,7 +11,9 @@ Run this checklist before publishing or pushing a customized copy.
 - Real trigger-learning evidence that reveals user behavior or private work.
 - Filled personal `AGENTS.md` files; publish only templates with placeholders.
 - Filled rule-maintenance ledgers such as `devolution-ledger.md`.
+- Filled local evolution histories such as `evolution-change-log.md`.
 - Passive trigger event logs, even when sanitized.
+- Hook state, Hook error logs, generated `hooks.json`, validator snapshots, and validator reports.
 - Project-specific source lists and unverified claims presented as facts.
 
 ## Sanitize
@@ -22,6 +24,7 @@ Run this checklist before publishing or pushing a customized copy.
 - Replace real trigger ledgers and external-skill registries with empty templates.
 - Replace personal shortcut words in shareable guidance with placeholders such as `<EVOLUTION_SHORTCUT>`.
 - Replace passive trigger examples with synthetic phrases and keep JSONL event logs out of Git.
+- Publish the Hook source, not a generated Hook command containing a local Python or user-home path.
 - Keep public skills focused on reusable process.
 
 ## Verify
@@ -32,3 +35,4 @@ Run this checklist before publishing or pushing a customized copy.
 4. Confirm every referenced file exists and every `agents/openai.yaml` still matches its skill.
 5. Confirm global guidance templates do not contain private projects, local paths, account names, or fixed personal shortcut words.
 6. Read representative files again from the remote repository after pushing.
+7. Confirm Hook fixtures use synthetic hashes and validator fixtures contain no real task links or local ledger records.

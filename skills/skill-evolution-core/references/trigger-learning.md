@@ -19,6 +19,7 @@ For each forced evolution run:
 3. Record the routing outcome, such as `coding-debug-rules`, `research-verification`, `project skill`, or `global guidance`.
 4. Increment the count only when the new case has the same intent and same destination as earlier cases.
 5. At count 3, mark the candidate as `promote-candidate`.
+6. Use `scripts/trigger_event_tools.py` to prefer recent labeled outcomes over old unlabeled observations; do not treat recency weight as automatic approval.
 
 ## Promotion Rule
 
@@ -28,6 +29,7 @@ At count 3:
 - Ask the user before promotion if the trigger is broad, ambiguous, project-sensitive, private, safety-sensitive, account-related, destructive, or affects publishing.
 - Prefer adding the trigger to `skill-evolution-router/references/semantic-rule-capture.md` or the relevant skill frontmatter description.
 - Do not store raw conversation transcripts. Store only sanitized short evidence.
+- Keep `actual_route` and correctness unknown until a person or the acting AI reviews the outcome.
 
 ## Better Than A Plain Counter
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Evolution Validator"
+  short_description: "Audit evolution routing, evidence, and freshness"
+  default_prompt: "Use $skill-evolution-validator to produce a report-first evolution-system audit without editing skills."

@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Evolution Router"
-  short_description: "Classify reusable lessons, triggers, and rule-maintenance candidates."
+  short_description: "Place durable rules in the right scope"
   default_prompt: "Use $skill-evolution-router to classify a reusable rule, failure lesson, passive trigger, or rule-maintenance candidate before editing skills."

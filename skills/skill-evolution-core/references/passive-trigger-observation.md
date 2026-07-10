@@ -40,7 +40,7 @@ Not allowed yet:
 | L1 | suggest | Suggest a likely route or shield in one compact summary; AI judges whether to use it. |
 | L2 | soft activate | AI may choose to apply the short hint; no long context load by default, and no script-owned routing. |
 | L3 | automatic light trigger | Future state only after accuracy evidence and user approval. |
-| L4 | configured forced trigger | Explicit configured shortcuts or explicit self-check requests. |
+| L4 | explicit route | Configured shortcuts route to core; explicit evolution-system audits route to the validator. |
 
 ## Promotion Gate
 
@@ -57,7 +57,9 @@ If a trigger is broad, private, safety-sensitive, account-related, destructive, 
 
 ## Event Ledger
 
-`scripts/passive_trigger_probe.py` can append JSONL rows to a local event ledger. The default ledger is created in the user's installed Codex home, not in the public repository.
+`scripts/passive_trigger_probe.py` can append JSONL rows to a local event ledger. The optional `UserPromptSubmit` Hook can also return one compact `additionalContext` route hint while preserving normal AI judgment. The default ledger is created in the user's installed Codex home, not in the public repository.
+
+Hook records store hashes and matched signal categories by default. Raw prompt text is redacted unless the user explicitly enables local text recording with `CODEX_PASSIVE_TRIGGER_RECORD_TEXT=1`.
 
 Each row should be one JSON object:
 
@@ -66,7 +68,7 @@ Each row should be one JSON object:
   "time": "2026-01-01T00:00:00+00:00",
   "trigger_level": "L1",
   "trigger_type": "passive_semantic_candidate",
-  "source_signal": "sanitized short phrase",
+  "source_signal": "[redacted]",
   "suggested_route": "coding-debug-rules",
   "actual_route": "",
   "confidence": "medium",
@@ -78,6 +80,8 @@ Each row should be one JSON object:
 ```
 
 Do not store raw full prompts, secrets, private account data, long logs, screenshots, or sensitive project details.
+
+Use `scripts/trigger_event_tools.py` to attach `actual_route` and `was_correct` after review. Its summary applies a 30-day half-life by default, so recent evidence weighs more than old evidence without deleting history. Counts and recency weights remain advisory and cannot promote a route automatically.
 
 ## Coding Shield Example
 
