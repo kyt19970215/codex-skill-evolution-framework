@@ -272,6 +272,10 @@ class InstallOrUpdateTests(unittest.TestCase):
         self.assertIn("<EVOLUTION_SHORTCUT>", text)
         self.assertIn("<ABSORPTION_SHORTCUT>", text)
         self.assertIn("<RULE_MAINTENANCE_SHORTCUT>", text)
+        self.assertIn("## Smallest Sufficient Path", text)
+        self.assertIn("## Source And Decision Gates", text)
+        self.assertIn("parallel workstreams or agents", text)
+        self.assertIn("source of truth", text)
         forbidden = [
             "C:" + "\\Users" + "\\",
             "G:" + "\\",

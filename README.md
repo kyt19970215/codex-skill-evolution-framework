@@ -15,7 +15,7 @@ It keeps six concerns separate:
 
 Shortcut aliases are local configuration. On first installation, each user chooses one shortcut for a full evolution pass and another for capability absorption. The public framework does not impose personal trigger words.
 
-The framework also includes an optional global guidance template at `templates/global-agents-template/AGENTS.md`. It is a privacy-clean starting point for response style, confirmation rhythm, rule layering, verification habits, file safety, and evolution routing. It is not installed automatically because a filled global `AGENTS.md` is personal configuration.
+The framework also includes an optional global guidance template at `templates/global-agents-template/AGENTS.md`. It is a privacy-clean starting point for response style, smallest-sufficient execution, source and decision gates, confirmation rhythm, rule layering, verification habits, file safety, and evolution routing. It is not installed automatically because a filled global `AGENTS.md` is personal configuration.
 
 Skill evolution now supports proportional load levels and observation-first passive trigger probes. The probe can record or suggest likely routes, but it does not execute workflows, edit files, install tools, commit, push, publish, or perform account actions.
 
