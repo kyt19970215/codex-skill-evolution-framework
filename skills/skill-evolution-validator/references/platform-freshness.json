@@ -1,0 +1,8 @@
+{
+  "last_reviewed": "2026-07-10",
+  "freshness_days": 30,
+  "sources": [
+    "https://developers.openai.com/codex/skills/",
+    "https://developers.openai.com/codex/hooks/"
+  ]
+}

@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Evolution Core"
-  short_description: "Evolve, maintain, absorb, and observe skill triggers safely."
-  default_prompt: "Use $skill-evolution-core for skill evolution, rule maintenance, passive trigger observation, or the capability-absorption route selected by the local entry."
+  short_description: "Evolve, absorb, and maintain skills safely"
+  default_prompt: "Use $skill-evolution-core for explicit skill evolution, rule maintenance, passive observation, or capability absorption; route manual system audits to the validator."

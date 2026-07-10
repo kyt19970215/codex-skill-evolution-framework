@@ -32,6 +32,17 @@ CODING_TERMS = [
     "import",
     "compile",
     "lint",
+    "typescript",
+    "javascript",
+    "python",
+    "react",
+    "rust",
+    "function",
+    "class",
+    "api",
+    "sdk",
+    "cli",
+    "crash",
     "代码",
     "编程",
     "报错",
@@ -45,6 +56,16 @@ CODING_TERMS = [
     "引号",
     "转义",
     "依赖",
+    "类型错误",
+    "类型不匹配",
+    "无法运行",
+    "编译失败",
+    "构建失败",
+    "测试失败",
+    "崩溃",
+    "异常",
+    "函数",
+    "接口",
 ]
 
 EVOLUTION_TERMS = [
@@ -91,6 +112,87 @@ HIGH_IMPACT_TERMS = [
     "令牌",
     "账号",
 ]
+
+EVOLUTION_CONTEXT_TERMS = (
+    "evolution skill",
+    "skill evolution",
+    "evolution system",
+    "skill system",
+    "trigger system",
+    "validator",
+    "自检器",
+)
+
+SELF_CHECK_TERMS = (
+    "self-check",
+    "self check",
+    "validation",
+    "validate",
+    "audit",
+    "health",
+    "freshness",
+    "cleanliness",
+    "behavior regression",
+    "ledger comparison",
+    "自检",
+    "校验",
+    "干净度",
+    "健康检查",
+    "行为回归",
+    "缺点",
+    "新鲜度",
+    "台账对照",
+)
+
+DISCUSSION_ONLY_TERMS = (
+    "discuss only",
+    "discussion only",
+    "do not run",
+    "don't run",
+    "do not execute",
+    "don't execute",
+    "do not modify",
+    "don't modify",
+    "question only",
+    "只是讨论",
+    "只讨论",
+    "不要执行",
+    "不执行",
+    "不要修改",
+    "不修改",
+    "只是询问",
+    "仅询问",
+)
+
+RULE_CAPTURE_TERMS = (
+    "save this as a durable rule",
+    "add this rule",
+    "add a rule",
+    "write this into a skill",
+    "write into skill",
+    "for future tasks",
+    "from now on",
+    "以后遇到",
+    "以后都",
+    "增加规则",
+    "添加规则",
+    "沉淀规则",
+    "写进 skill",
+    "加入 skill",
+)
+
+CONTINUATION_TERMS = (
+    "continue",
+    "next step",
+    "previous task",
+    "previous message",
+    "carry on",
+    "继续",
+    "下一步",
+    "上一条",
+    "上一个",
+    "接着",
+)
 
 SECRET_PATTERNS = [
     re.compile(r"sk-[A-Za-z0-9_-]{12,}"),
@@ -144,6 +246,22 @@ def hits(text: str, terms: list[str]) -> list[str]:
     return found
 
 
+def contains_any(text: str, terms: tuple[str, ...]) -> bool:
+    lower = text.casefold()
+    return any(term.casefold() in lower for term in terms)
+
+
+def normalize_shortcut_text(text: str) -> str:
+    return text.strip().strip(".!?。！？ ").casefold()
+
+
+def shortcut_matches(text: str, shortcuts: list[str]) -> tuple[bool, bool]:
+    normalized = normalize_shortcut_text(text)
+    exact = any(normalized == normalize_shortcut_text(value) for value in shortcuts)
+    contained = any(value.casefold() in text.casefold() for value in shortcuts)
+    return exact, contained
+
+
 def load_manifest_triggers(path: Path) -> dict[str, str]:
     if not path.is_file():
         return {}
@@ -167,16 +285,21 @@ def configured_shortcuts(args: argparse.Namespace) -> list[str]:
     return [value.strip() for value in values if value and value.strip()]
 
 
-def classify(text: str, shortcuts: list[str]) -> dict[str, Any]:
+def classify(
+    text: str,
+    shortcuts: list[str],
+    context_route: str = "",
+) -> dict[str, Any]:
     coding = hits(text, CODING_TERMS)
     evolution = hits(text, EVOLUTION_TERMS)
     high_impact = hits(text, HIGH_IMPACT_TERMS)
 
-    forced = [shortcut for shortcut in shortcuts if shortcut.casefold() in text.casefold()]
-    explicit_self_check = any(
-        term in text.casefold()
-        for term in ("self-check", "self check", "validation", "validate", "ledger comparison")
-    ) or any(term in text for term in ("自检", "校验", "台账对照"))
+    exact_shortcut, contained_shortcut = shortcut_matches(text, shortcuts)
+    discussion_only = contains_any(text, DISCUSSION_ONLY_TERMS)
+    evolution_context = bool(evolution) or contains_any(text, EVOLUTION_CONTEXT_TERMS)
+    explicit_self_check = evolution_context and contains_any(text, SELF_CHECK_TERMS)
+    rule_capture = contains_any(text, RULE_CAPTURE_TERMS)
+    continuation = bool(context_route) and contains_any(text, CONTINUATION_TERMS)
 
     shield_hints: list[str] = []
     lower = text.lower()
@@ -191,16 +314,41 @@ def classify(text: str, shortcuts: list[str]) -> dict[str, Any]:
     if not shield_hints and coding:
         shield_hints = ["environment", "path", "encoding", "quoting"]
 
-    if forced or explicit_self_check:
+    if exact_shortcut:
         suggested_route = "skill-evolution-core"
         trigger_level = "L4"
-        trigger_type = "configured_or_explicit_trigger"
+        trigger_type = "configured_shortcut"
+        confidence = "high"
+    elif explicit_self_check:
+        suggested_route = "skill-evolution-validator"
+        trigger_level = "L4"
+        trigger_type = "explicit_self_check"
+        confidence = "high"
+    elif discussion_only:
+        suggested_route = ""
+        trigger_level = "L0"
+        trigger_type = "discussion_only"
+        confidence = "high"
+    elif contained_shortcut:
+        suggested_route = "skill-evolution-core"
+        trigger_level = "L4"
+        trigger_type = "configured_shortcut_in_request"
+        confidence = "high"
+    elif rule_capture:
+        suggested_route = "skill-evolution-router"
+        trigger_level = "L1"
+        trigger_type = "passive_rule_capture_candidate"
         confidence = "high"
     elif coding:
         suggested_route = "coding-debug-rules"
         trigger_level = "L1"
         trigger_type = "passive_coding_shield_candidate"
         confidence = "medium" if len(coding) < 3 else "high"
+    elif continuation:
+        suggested_route = context_route
+        trigger_level = "L1"
+        trigger_type = "passive_context_continuation"
+        confidence = "medium"
     elif evolution:
         suggested_route = "skill-evolution-router"
         trigger_level = "L1"
@@ -226,6 +374,12 @@ def classify(text: str, shortcuts: list[str]) -> dict[str, Any]:
         "need_ai_review": bool(high_impact or confidence == "low"),
         "auto_action_allowed": False,
         "observation_phase": True,
+        "reason_codes": {
+            "discussion_only": discussion_only,
+            "explicit_self_check": explicit_self_check,
+            "rule_capture": rule_capture,
+            "continuation": continuation,
+        },
     }
 
 

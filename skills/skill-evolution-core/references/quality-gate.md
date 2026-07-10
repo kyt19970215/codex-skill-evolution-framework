@@ -21,10 +21,16 @@ Before finishing a skill update, check:
 - If the update adds a learned trigger word, does `trigger-candidates.md` show enough sanitized evidence and a clear routing outcome?
 - Could the learned trigger make a skill trigger too broadly or on ordinary conversation?
 - If this update adds passive semantic triggering, is it kept in observation mode L0-L2 unless a validation report and user approval support L3 promotion?
+- Does the Hook return only advisory context, avoid blocking by default, and preserve all approval and safety boundaries?
+- Are prompt text, session identifiers, working directories, and transcripts absent from default event records except as short hashes?
+- Were representative positive, negative, discussion-only, audit, coding-failure, and continuation cases executed rather than checked only by keyword presence?
+- Are real Hook events separated from smoke tests, with `actual_route` and `was_correct` left unknown until reviewed?
+- Does route weighting decay old evidence without automatically promoting or executing a route?
 - Did any repeated trigger counting use `scripts/passive_trigger_probe.py` or another compact script-readable ledger instead of forcing AI to reread long conversation history?
 - If the update relaxed, scoped, downgraded, archived, or removed a rule, was `references/rule-lifecycle.md` applied and `references/devolution-ledger.md` updated?
 - If this update relaxed, downgraded, split trigger levels, or made a check conditional, did tests and user confirmation cover the changed semantics or execution effect?
 - If the claimed change is only cleanup, did representative trigger checks show equivalent behavior after the edit?
 - Were Chinese or other non-ASCII rules read/written with explicit UTF-8?
 - Did the validator pass after structural changes?
+- For a manual validator run, did `fast` clearly remain log-based while `full` executed behavior cases and ledger reconciliation?
 - Did the final answer name changed files and verification?

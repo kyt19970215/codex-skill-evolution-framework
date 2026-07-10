@@ -66,6 +66,19 @@ class InstallOrUpdateTests(unittest.TestCase):
         registry.parent.mkdir(parents=True, exist_ok=True)
         registry.write_text(f"upstream registry template {version}\n", encoding="utf-8")
 
+        change_log = (
+            self.source
+            / "skills"
+            / "skill-evolution-core"
+            / "references"
+            / "evolution-change-log.md"
+        )
+        change_log.write_text(f"upstream change log {version}\n", encoding="utf-8")
+
+        hook = self.source / "hooks" / "user_prompt_passive_trigger.py"
+        hook.parent.mkdir(parents=True, exist_ok=True)
+        hook.write_text(f"# public passive hook {version}\n", encoding="utf-8")
+
     def _first_install(self):
         return install_or_update(
             source_root=self.source,
@@ -86,6 +99,10 @@ class InstallOrUpdateTests(unittest.TestCase):
         self.assertTrue(
             (self.codex_home / "skills" / "skill-evolution-core" / "SKILL.md").is_file()
         )
+        self.assertTrue(
+            (self.codex_home / "skills" / "skill-evolution-validator" / "SKILL.md").is_file()
+        )
+        self.assertFalse((self.codex_home / "hooks.json").exists())
 
         manifest = json.loads(
             (self.codex_home / ".skill-evolution-framework.json").read_text(
@@ -205,9 +222,17 @@ class InstallOrUpdateTests(unittest.TestCase):
             / "references"
             / "devolution-ledger.md"
         )
+        change_log = (
+            self.codex_home
+            / "skills"
+            / "skill-evolution-core"
+            / "references"
+            / "evolution-change-log.md"
+        )
         trigger_candidates.write_text("my trigger history\n", encoding="utf-8")
         registry.write_text("my installed capabilities\n", encoding="utf-8")
         devolution_ledger.write_text("my devolution decisions\n", encoding="utf-8")
+        change_log.write_text("my local evolution history\n", encoding="utf-8")
         self._write_source("v2")
 
         result = install_or_update(
@@ -221,6 +246,9 @@ class InstallOrUpdateTests(unittest.TestCase):
         self.assertEqual(
             devolution_ledger.read_text(encoding="utf-8"), "my devolution decisions\n"
         )
+        self.assertEqual(
+            change_log.read_text(encoding="utf-8"), "my local evolution history\n"
+        )
         self.assertIn(
             "skills/skill-evolution-core/references/trigger-candidates.md",
             result.preserved,
@@ -233,6 +261,175 @@ class InstallOrUpdateTests(unittest.TestCase):
             "skills/codex-capability-router/references/external-skill-registry.md",
             result.preserved,
         )
+        self.assertIn(
+            "skills/skill-evolution-core/references/evolution-change-log.md",
+            result.preserved,
+        )
+
+    def test_optional_hook_install_preserves_existing_hook_configuration(self) -> None:
+        hooks_json = self.codex_home / "hooks.json"
+        hooks_json.parent.mkdir(parents=True, exist_ok=True)
+        hooks_json.write_text(
+            json.dumps(
+                {
+                    "hooks": {
+                        "Stop": [
+                            {
+                                "hooks": [
+                                    {"type": "command", "command": "existing-stop-hook"}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        result = install_or_update(
+            source_root=self.source,
+            codex_home=self.codex_home,
+            evolution_trigger="review-growth",
+            absorption_trigger="absorb-capability",
+            non_interactive=True,
+            enable_passive_hook=True,
+            python_executable=sys.executable,
+        )
+
+        payload = json.loads(hooks_json.read_text(encoding="utf-8"))
+        self.assertTrue(result.hook_configured)
+        self.assertEqual(
+            payload["hooks"]["Stop"][0]["hooks"][0]["command"],
+            "existing-stop-hook",
+        )
+        command = payload["hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
+        self.assertIn("user_prompt_passive_trigger.py", command)
+        self.assertTrue(
+            (self.codex_home / "hooks" / "user_prompt_passive_trigger.py").is_file()
+        )
+        manifest = json.loads(
+            (self.codex_home / ".skill-evolution-framework.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertTrue(manifest["passive_hook"]["enabled"])
+
+    def test_hook_update_preserves_other_handlers_in_the_same_block(self) -> None:
+        hooks_json = self.codex_home / "hooks.json"
+        hooks_json.parent.mkdir(parents=True, exist_ok=True)
+        hooks_json.write_text(
+            json.dumps(
+                {
+                    "hooks": {
+                        "UserPromptSubmit": [
+                            {
+                                "matcher": "legacy-metadata",
+                                "hooks": [
+                                    {"type": "command", "command": "existing-prompt-hook"},
+                                    {
+                                        "type": "command",
+                                        "command": "python old/user_prompt_passive_trigger.py",
+                                    },
+                                ],
+                            }
+                        ]
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        install_or_update(
+            source_root=self.source,
+            codex_home=self.codex_home,
+            evolution_trigger="review-growth",
+            absorption_trigger="absorb-capability",
+            non_interactive=True,
+            enable_passive_hook=True,
+            python_executable=sys.executable,
+        )
+
+        blocks = json.loads(hooks_json.read_text(encoding="utf-8"))["hooks"][
+            "UserPromptSubmit"
+        ]
+        self.assertEqual(blocks[0]["matcher"], "legacy-metadata")
+        self.assertEqual(
+            blocks[0]["hooks"],
+            [{"type": "command", "command": "existing-prompt-hook"}],
+        )
+        managed = [
+            handler
+            for block in blocks
+            for handler in block.get("hooks", [])
+            if "user_prompt_passive_trigger.py" in handler.get("command", "")
+        ]
+        self.assertEqual(len(managed), 1)
+
+    def test_hook_install_refuses_mixed_inline_configuration(self) -> None:
+        config = self.codex_home / "config.toml"
+        config.parent.mkdir(parents=True, exist_ok=True)
+        config.write_text("[hooks]\n", encoding="utf-8")
+
+        with self.assertRaisesRegex(ValueError, "inline Hook"):
+            install_or_update(
+                source_root=self.source,
+                codex_home=self.codex_home,
+                evolution_trigger="review-growth",
+                absorption_trigger="absorb-capability",
+                non_interactive=True,
+                enable_passive_hook=True,
+            )
+
+        self.assertEqual(config.read_text(encoding="utf-8"), "[hooks]\n")
+        self.assertFalse((self.codex_home / "hooks.json").exists())
+
+    def test_hook_preflight_rejects_invalid_json_before_copying_skills(self) -> None:
+        hooks_json = self.codex_home / "hooks.json"
+        hooks_json.parent.mkdir(parents=True, exist_ok=True)
+        hooks_json.write_text("{invalid", encoding="utf-8")
+
+        with self.assertRaisesRegex(ValueError, "safely update"):
+            install_or_update(
+                source_root=self.source,
+                codex_home=self.codex_home,
+                evolution_trigger="review-growth",
+                absorption_trigger="absorb-capability",
+                non_interactive=True,
+                enable_passive_hook=True,
+            )
+
+        self.assertFalse((self.codex_home / "skills").exists())
+        self.assertEqual(hooks_json.read_text(encoding="utf-8"), "{invalid")
+
+    def test_first_hook_install_does_not_activate_an_unmanaged_hook_file(self) -> None:
+        hook = self.codex_home / "hooks" / "user_prompt_passive_trigger.py"
+        hook.parent.mkdir(parents=True, exist_ok=True)
+        hook.write_text("# personal hook\n", encoding="utf-8")
+
+        result = install_or_update(
+            source_root=self.source,
+            codex_home=self.codex_home,
+            evolution_trigger="review-growth",
+            absorption_trigger="absorb-capability",
+            non_interactive=True,
+            enable_passive_hook=True,
+        )
+
+        self.assertFalse(result.hook_configured)
+        self.assertEqual(hook.read_text(encoding="utf-8"), "# personal hook\n")
+        pending = (
+            self.codex_home
+            / ".skill-evolution-updates"
+            / "hooks"
+            / "user_prompt_passive_trigger.py"
+        )
+        self.assertTrue(pending.is_file())
+        manifest = json.loads(
+            (self.codex_home / ".skill-evolution-framework.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertFalse(manifest["passive_hook"]["enabled"])
 
     def test_update_leaves_unmanaged_local_skill_untouched(self) -> None:
         self._first_install()
