@@ -473,6 +473,9 @@ class InstallOrUpdateTests(unittest.TestCase):
         self.assertIn("## Source And Decision Gates", text)
         self.assertIn("parallel workstreams or agents", text)
         self.assertIn("source of truth", text)
+        self.assertIn("## Rule Authority And Conflict Resolution", text)
+        self.assertIn("loading and routing", text)
+        self.assertIn("hard boundaries", text)
         forbidden = [
             "C:" + "\\Users" + "\\",
             "G:" + "\\",

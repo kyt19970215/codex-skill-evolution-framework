@@ -9,6 +9,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,28 @@ EXPECTED_SKILLS = {
     "skill-evolution-validator",
 }
 SNAPSHOT_EXCLUDES = {"evolution-trigger-events.jsonl"}
+FRAMEWORK_SYNC_EXCLUDES = {
+    "skill-evolution-core/references/trigger-candidates.md",
+    "skill-evolution-core/references/devolution-ledger.md",
+    "skill-evolution-core/references/evolution-change-log.md",
+    "skill-evolution-core/references/evolution-trigger-events.jsonl",
+    "codex-capability-router/references/external-skill-registry.md",
+}
+AUTHORITY_HEADINGS = (
+    "rule authority and conflict resolution",
+    "规则权威与冲突处理",
+)
+BLANKET_OVERRIDE_PATTERNS = (
+    re.compile(r"\b(?:ignore|override)\s+(?:all\s+)?global\b", re.I),
+    re.compile(r"\bproject rules?\s+(?:always|unconditionally)\s+(?:win|override)", re.I),
+    re.compile(r"忽略(?:所有|全部)?全局"),
+    re.compile(r"(?:项目规则|更靠近当前项目的规则).*(?:无条件|始终|一律).*(?:优先|覆盖|为准)"),
+    re.compile(r"项目规则无条件覆盖"),
+)
+NEGATED_OVERRIDE_MARKERS = (
+    "do not", "must not", "never", "not blanket", "cannot",
+    "不得", "不要", "禁止", "不代表", "不能", "并非",
+)
 
 
 def codex_home() -> Path:
@@ -120,6 +143,250 @@ def add_finding(
     detail: str,
 ) -> None:
     findings.append({"severity": severity, "title": title, "detail": detail})
+
+
+def _has_authority_heading(text: str) -> bool:
+    lowered = text.casefold()
+    return any(heading in lowered for heading in AUTHORITY_HEADINGS)
+
+
+def discover_project_agents(
+    project_root: Path | None,
+    current_dir: Path | None = None,
+) -> list[Path]:
+    if project_root is None:
+        return []
+    root = Path(project_root).resolve()
+    current = Path(current_dir).resolve() if current_dir is not None else root
+    try:
+        relative = current.relative_to(root)
+    except ValueError:
+        relative = Path()
+    directories = [root]
+    cursor = root
+    for part in relative.parts:
+        cursor = cursor / part
+        directories.append(cursor)
+    found: list[Path] = []
+    for directory in directories:
+        for name in ("AGENTS.override.md", "AGENTS.md"):
+            candidate = directory / name
+            if candidate.is_file():
+                found.append(candidate)
+                break
+    return found
+
+
+def _blanket_override_lines(path: Path) -> list[str]:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return []
+    conflicts: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        lowered = stripped.casefold()
+        if any(marker in lowered for marker in NEGATED_OVERRIDE_MARKERS):
+            continue
+        if any(pattern.search(stripped) for pattern in BLANKET_OVERRIDE_PATTERNS):
+            conflicts.append(stripped[:240])
+    return conflicts
+
+
+def validate_rule_authority(
+    skills_root: Path,
+    global_agents: Path | None,
+    project_root: Path | None,
+    findings: list[dict[str, str]],
+    current_dir: Path | None = None,
+) -> dict[str, Any]:
+    conflicts: list[dict[str, str]] = []
+    checked_files: list[str] = []
+    if global_agents is not None:
+        global_path = Path(global_agents).expanduser().resolve()
+        if global_path.is_file():
+            checked_files.append(str(global_path))
+            text = global_path.read_text(encoding="utf-8")
+            if not _has_authority_heading(text):
+                conflicts.append(
+                    {
+                        "file": str(global_path),
+                        "type": "missing_authority_model",
+                        "detail": "The guidance does not separate loading/routing order from rule authority.",
+                    }
+                )
+            for line in _blanket_override_lines(global_path):
+                conflicts.append(
+                    {
+                        "file": str(global_path),
+                        "type": "blanket_project_precedence",
+                        "detail": line,
+                    }
+                )
+
+    project_router = Path(skills_root) / "project-rules-router" / "SKILL.md"
+    if project_router.is_file():
+        checked_files.append(str(project_router.resolve()))
+        if not _has_authority_heading(project_router.read_text(encoding="utf-8")):
+            conflicts.append(
+                {
+                    "file": str(project_router.resolve()),
+                    "type": "router_missing_conflict_branch",
+                    "detail": "The project router does not classify policy conflicts separately from stale technical facts.",
+                }
+            )
+
+    project_agents = discover_project_agents(project_root, current_dir=current_dir)
+    for path in project_agents:
+        checked_files.append(str(path.resolve()))
+        for line in _blanket_override_lines(path):
+            conflicts.append(
+                {
+                    "file": str(path.resolve()),
+                    "type": "project_waives_global_boundary",
+                    "detail": line,
+                }
+            )
+
+    if conflicts:
+        add_finding(
+            findings,
+            "P1",
+            "Rule authority conflict",
+            f"{len(conflicts)} authority or blanket-override issue(s) require evolution review.",
+        )
+    status = "failed" if conflicts else "passed"
+    if not checked_files:
+        status = "not_configured"
+    return {
+        "status": status,
+        "checked_files": checked_files,
+        "project_agents": [str(path.resolve()) for path in project_agents],
+        "conflicts": conflicts,
+    }
+
+
+def _framework_file_map(root: Path) -> dict[str, str]:
+    files: dict[str, str] = {}
+    if not root.is_dir():
+        return files
+    for skill_name in sorted(EXPECTED_SKILLS):
+        skill_root = root / skill_name
+        if not skill_root.is_dir():
+            continue
+        for path in sorted(skill_root.rglob("*")):
+            if not path.is_file() or "__pycache__" in path.parts or "data" in path.parts:
+                continue
+            if path.suffix.lower() in {".pyc", ".sqlite", ".sqlite3", ".db", ".jsonl"}:
+                continue
+            relative = path.relative_to(root).as_posix()
+            if relative in FRAMEWORK_SYNC_EXCLUDES:
+                continue
+            files[relative] = hash_file(path)
+    return files
+
+
+def compare_framework_source(
+    skills_root: Path,
+    framework_root: Path | None,
+    findings: list[dict[str, str]],
+) -> dict[str, Any]:
+    if framework_root is None:
+        return {
+            "status": "not_configured",
+            "framework_root": "",
+            "different_files": [],
+            "installed_only": [],
+            "source_only": [],
+            "excluded_files": sorted(FRAMEWORK_SYNC_EXCLUDES),
+        }
+    source_root = Path(framework_root).expanduser().resolve()
+    if (source_root / "skills").is_dir():
+        source_root = source_root / "skills"
+    installed_root = Path(skills_root).expanduser().resolve()
+    installed = _framework_file_map(installed_root)
+    source = _framework_file_map(source_root)
+    if not source:
+        add_finding(
+            findings,
+            "P2",
+            "Framework source comparison is unavailable",
+            f"No managed framework skills were found under {source_root}.",
+        )
+        return {
+            "status": "unavailable",
+            "framework_root": str(source_root),
+            "different_files": [],
+            "installed_only": [],
+            "source_only": [],
+            "excluded_files": sorted(FRAMEWORK_SYNC_EXCLUDES),
+        }
+    shared = set(installed) & set(source)
+    different = sorted(path for path in shared if installed[path] != source[path])
+    installed_only = sorted(set(installed) - set(source))
+    source_only = sorted(set(source) - set(installed))
+    status = "drift" if different or installed_only or source_only else "aligned"
+    if status == "drift":
+        add_finding(
+            findings,
+            "P2",
+            "Installed and public framework sources differ",
+            (
+                f"Review {len(different)} changed, {len(installed_only)} installed-only, "
+                f"and {len(source_only)} source-only managed file(s) before publishing."
+            ),
+        )
+    return {
+        "status": status,
+        "framework_root": str(source_root),
+        "different_files": different,
+        "installed_only": installed_only,
+        "source_only": source_only,
+        "excluded_files": sorted(FRAMEWORK_SYNC_EXCLUDES),
+    }
+
+
+def build_repair_handoff(
+    findings: list[dict[str, str]],
+    authorized: bool,
+) -> dict[str, Any]:
+    review_only_markers = (
+        "no real conversation evidence",
+        "sources differ",
+        "route outcomes remain unlabeled",
+        "trust is not recorded",
+    )
+    repair_candidates = [
+        item for item in findings if item.get("severity") in {"P0", "P1", "P2"}
+    ]
+    review_only = [
+        item
+        for item in repair_candidates
+        if any(
+            marker in str(item.get("title", "")).casefold()
+            for marker in review_only_markers
+        )
+    ]
+    actionable = [item for item in repair_candidates if item not in review_only]
+    if not authorized:
+        status = "not_authorized"
+    elif actionable:
+        status = "ready"
+    else:
+        status = "not_needed"
+    return {
+        "authorized": authorized,
+        "status": status,
+        "owner": "skill-evolution-core",
+        "validator_edits_files": False,
+        "actionable_findings": actionable,
+        "review_only_findings": review_only,
+        "next_step": (
+            "Route findings through skill-evolution-core and skill-evolution-router, update the local ledger, then rerun full validation."
+            if status == "ready"
+            else "Keep the validator report-only until repair is explicitly authorized."
+        ),
+    }
 
 
 def validate_structure(
@@ -368,6 +635,68 @@ def event_summary(skills_root: Path, now: dt.datetime) -> dict[str, Any]:
     return tools.build_summary(tools.load_events(ledger), now=now)
 
 
+def inspect_hook_health(
+    codex_home_path: Path,
+    hook_enabled: bool,
+    event_summary: dict[str, Any],
+    findings: list[dict[str, str]],
+) -> dict[str, Any]:
+    home = Path(codex_home_path).expanduser().resolve()
+    if not hook_enabled:
+        return {
+            "status": "disabled",
+            "enabled": False,
+            "definition_ok": False,
+            "wrapper_present": False,
+            "trust_present": False,
+            "real_hook_events": int(event_summary.get("real_hook_events", 0)),
+        }
+    hooks_path = home / "hooks.json"
+    wrapper = home / "hooks" / "user_prompt_passive_trigger.py"
+    config = home / "config.toml"
+    hooks = load_json(hooks_path, {})
+    rendered = json.dumps(hooks, ensure_ascii=False) if isinstance(hooks, dict) else ""
+    definition_ok = "UserPromptSubmit" in rendered and "user_prompt_passive_trigger.py" in rendered
+    wrapper_present = wrapper.is_file()
+    config_text = ""
+    try:
+        config_text = config.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        pass
+    trust_present = "user_prompt_submit" in config_text.casefold() and "trusted_hash" in config_text.casefold()
+    real_events = int(event_summary.get("real_hook_events", 0))
+    if not definition_ok or not wrapper_present:
+        add_finding(
+            findings,
+            "P1",
+            "Enabled Hook is incomplete",
+            "The manifest enables the advisory Hook, but its definition or wrapper is missing.",
+        )
+    if not trust_present:
+        add_finding(
+            findings,
+            "P2",
+            "Hook trust is not recorded",
+            "Review and trust the exact UserPromptSubmit definition before relying on it.",
+        )
+    if real_events == 0:
+        add_finding(
+            findings,
+            "P2",
+            "Hook has no real conversation evidence",
+            "Definition and smoke tests do not prove that UserPromptSubmit ran in a real task.",
+        )
+    status = "healthy" if definition_ok and wrapper_present and trust_present and real_events else "configured_no_events" if definition_ok and wrapper_present and trust_present else "incomplete"
+    return {
+        "status": status,
+        "enabled": True,
+        "definition_ok": definition_ok,
+        "wrapper_present": wrapper_present,
+        "trust_present": trust_present,
+        "real_hook_events": real_events,
+    }
+
+
 def write_snapshot(path: Path, snapshot: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -380,6 +709,10 @@ def render_markdown(report: dict[str, Any]) -> str:
     freshness = report["platform_freshness"]
     events = report["event_summary"]
     ledger = report["ledger_reconciliation"]
+    authority = report["rule_authority"]
+    framework = report["framework_sync"]
+    repair = report["repair_handoff"]
+    hook = report["hook_health"]
     findings = report["findings"]
     lines = [
         "# Evolution Skill Validation Report",
@@ -401,16 +734,45 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Smoke-test events: {events['smoke_test_events']}",
         f"- Unlabeled events: {events['unlabeled']}",
         "",
+        "## Hook health",
+        "",
+        f"- Status: `{hook['status']}`",
+        f"- Enabled: `{hook['enabled']}`",
+        f"- Definition valid: `{hook['definition_ok']}`",
+        f"- Trust recorded: `{hook['trust_present']}`",
+        "",
         "## Ledger reconciliation",
         "",
         f"- Changed files: {len(report['file_changes']['all'])}",
         f"- Unmatched files: {len(ledger['unmatched_changed_files'])}",
+        "",
+        "## Rule authority and conflict resolution",
+        "",
+        f"- Status: `{authority['status']}`",
+        f"- Checked files: {len(authority['checked_files'])}",
+        f"- Conflicts: {len(authority['conflicts'])}",
+        "",
+        "## Installed versus public framework",
+        "",
+        f"- Status: `{framework['status']}`",
+        f"- Different files: {len(framework['different_files'])}",
+        f"- Installed-only files: {len(framework['installed_only'])}",
+        f"- Source-only files: {len(framework['source_only'])}",
         "",
         "## Platform freshness",
         "",
         f"- Last reviewed: `{freshness['last_reviewed'] or 'unknown'}`",
         f"- Age days: {freshness['age_days'] if freshness['age_days'] is not None else 'unknown'}",
         f"- Stale: `{freshness['stale']}`",
+        "",
+        "## Repair handoff",
+        "",
+        f"- Authorized: `{repair['authorized']}`",
+        f"- Status: `{repair['status']}`",
+        f"- Owner: `{repair['owner']}`",
+        f"- Validator edits files: `{repair['validator_edits_files']}`",
+        f"- Actionable findings: {len(repair['actionable_findings'])}",
+        f"- Review-only findings: {len(repair['review_only_findings'])}",
         "",
         "## Findings",
         "",
@@ -438,6 +800,12 @@ def run_validation(
     manifest_path: Path,
     mode: str = "auto",
     now: dt.datetime | None = None,
+    global_agents: Path | None = None,
+    project_root: Path | None = None,
+    framework_root: Path | None = None,
+    repair_authorized: bool = False,
+    codex_home_path: Path | None = None,
+    project_cwd: Path | None = None,
 ) -> dict[str, Any]:
     skills_root = Path(skills_root).resolve()
     output_dir = Path(output_dir).resolve()
@@ -491,9 +859,35 @@ def run_validation(
     if selected_mode == "full":
         structure = validate_structure(skills_root, findings)
         behavior = run_behavior_regression(skills_root, manifest_path, findings)
+        authority = validate_rule_authority(
+            skills_root=skills_root,
+            global_agents=global_agents,
+            project_root=project_root,
+            findings=findings,
+            current_dir=project_cwd,
+        )
+        framework = compare_framework_source(
+            skills_root=skills_root,
+            framework_root=framework_root,
+            findings=findings,
+        )
     else:
         structure = {"status": "not_run", "checked": 0, "missing": []}
         behavior = {"status": "not_run", "passed": 0, "failed": 0, "cases": []}
+        authority = {
+            "status": "not_run",
+            "checked_files": [],
+            "project_agents": [],
+            "conflicts": [],
+        }
+        framework = {
+            "status": "not_run",
+            "framework_root": "",
+            "different_files": [],
+            "installed_only": [],
+            "source_only": [],
+            "excluded_files": sorted(FRAMEWORK_SYNC_EXCLUDES),
+        }
 
     ledger = reconcile_ledger(skills_root, changes["all"], findings)
     freshness = platform_freshness(skills_root, current_time, findings)
@@ -506,6 +900,18 @@ def run_validation(
             f"{events['unlabeled']} local event(s) need actual-route review.",
         )
 
+    manifest_payload = load_json(manifest_path, {})
+    passive_hook = manifest_payload.get("passive_hook", {}) if isinstance(manifest_payload, dict) else {}
+    hook_enabled = isinstance(passive_hook, dict) and passive_hook.get("enabled") is True
+    hook = inspect_hook_health(
+        codex_home_path=codex_home_path or skills_root.parent,
+        hook_enabled=hook_enabled,
+        event_summary=events,
+        findings=findings,
+    )
+
+    repair_handoff = build_repair_handoff(findings, repair_authorized)
+
     blocking = any(item["severity"] in {"P0", "P1"} for item in findings)
     snapshot_updated = not blocking and not (
         selected_mode == "fast" and bool(changes["all"])
@@ -513,6 +919,7 @@ def run_validation(
     run_id = current_time.strftime("%Y%m%dT%H%M%SZ") + f"-{selected_mode}"
     report_path = output_dir / f"{run_id}-evolution-validation.md"
     json_path = output_dir / f"{run_id}-evolution-validation.json"
+    snapshot_archive_path = state_dir / "snapshots" / f"{run_id}.json"
     report: dict[str, Any] = {
         "run_id": run_id,
         "mode": selected_mode,
@@ -521,13 +928,18 @@ def run_validation(
         "structure": structure,
         "behavior_regression": behavior,
         "event_summary": events,
+        "hook_health": hook,
         "file_changes": changes,
         "ledger_reconciliation": ledger,
+        "rule_authority": authority,
+        "framework_sync": framework,
+        "repair_handoff": repair_handoff,
         "platform_freshness": freshness,
         "findings": findings,
         "report_path": str(report_path),
         "json_path": str(json_path),
         "snapshot_path": str(snapshot_path),
+        "snapshot_archive_path": str(snapshot_archive_path),
         "snapshot_updated": snapshot_updated,
         "last_run_path": str(last_run_path),
     }
@@ -538,6 +950,7 @@ def run_validation(
     )
     if snapshot_updated:
         write_snapshot(snapshot_path, snapshot)
+        write_snapshot(snapshot_archive_path, snapshot)
     write_snapshot(
         last_run_path,
         {
@@ -556,6 +969,27 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--skills-root", type=Path, default=default_skills_root())
     parser.add_argument("--output-dir", type=Path, default=default_output_dir())
     parser.add_argument("--manifest", type=Path, default=default_manifest())
+    parser.add_argument(
+        "--global-agents",
+        type=Path,
+        default=codex_home() / "AGENTS.md",
+        help="Global guidance file to include in rule-authority checks.",
+    )
+    parser.add_argument(
+        "--project-root",
+        type=Path,
+        help="Current repository root whose active AGENTS.md should be checked.",
+    )
+    parser.add_argument(
+        "--framework-root",
+        type=Path,
+        help="Optional public framework checkout used for installed/source drift reporting.",
+    )
+    parser.add_argument(
+        "--repair-authorized",
+        action="store_true",
+        help="Emit a repair handoff to skill-evolution-core; the validator still does not edit files.",
+    )
     return parser
 
 
@@ -566,6 +1000,12 @@ def main() -> int:
         output_dir=args.output_dir,
         manifest_path=args.manifest,
         mode=args.mode,
+        global_agents=args.global_agents,
+        project_root=args.project_root,
+        framework_root=args.framework_root,
+        repair_authorized=args.repair_authorized,
+        codex_home_path=codex_home(),
+        project_cwd=Path.cwd(),
     )
     print(f"status={report['status']}")
     print(f"mode={report['mode']}")

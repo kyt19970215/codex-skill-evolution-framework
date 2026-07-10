@@ -7,6 +7,14 @@ description: Global router for project-specific Codex rules and capability selec
 
 Use this skill as a first-pass router for project work. It does not replace local evidence, user instructions, or external verification; it decides which project-specific rules should be consulted and how strongly to trust them.
 
+## Rule Authority And Conflict Resolution
+
+- Treat global/project layering as routing and default specificity, not blanket permission for project guidance to override every global rule.
+- Project skills and repository `AGENTS.md` may specialize paths, commands, terminology, implementation details, project facts, verification, and soft workflow defaults.
+- They must not silently weaken explicit global authorization, privacy, safety, destructive-action, account/payment/publishing, or user-locked personal boundaries.
+- For current technical facts, prefer current files, configuration, versions, logs, tests, and explicit user decisions, then mark stale rules for evolution review.
+- A genuine project exception to a personal global boundary requires explicit current-user approval plus scope, rationale, one-off or durable status, and review or expiry. Higher system/developer boundaries remain unchanged.
+
 ## Routing Workflow
 
 1. Identify project signals before acting:
@@ -49,6 +57,8 @@ Use this skill as a first-pass router for project work. It does not replace loca
    - Reusable global skill workflow, if applicable.
    - Project-preferred public sources.
    - Broader public sources such as official docs, release notes, GitHub issues, maintainer replies, forums, and search results.
+
+   Before applying this evidence order, classify an apparent conflict as `hard boundary`, `specializable default`, or `current technical fact`. Evidence can replace stale facts; it cannot silently waive policy or authorization.
 
 7. Treat project skills as priority guides, not hard boundaries:
    - A preferred source list means "check these first", not "only use these".
