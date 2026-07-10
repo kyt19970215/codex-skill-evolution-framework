@@ -12,7 +12,7 @@
 4. `coding-debug-rules`：排查 Shell、编码、路径、依赖、构建和测试问题。
 5. `research-verification`：通过当前公开来源验证工具、API、版本和报错行为。
 6. `codex-capability-router`：从已安装的 Skill、插件、应用和 MCP 工具中选择合适能力。
-7. `skill-evolution-validator`：手动检查结构、触发行为、本地台账、隐私和平台资料新鲜度。
+7. `skill-evolution-validator`：手动检查结构、触发行为、本地台账、规则权威、本地/公开版差异、隐私和平台资料新鲜度。
 
 快捷触发词属于每位使用者自己的本地配置。首次安装时，使用者分别选择一个完整进化入口和一个能力吸收入口；公开框架不预设个人触发词。
 
@@ -68,11 +68,13 @@ python scripts/validate_framework.py
 
 验证器会检查 Skill 元数据、目录命名、引用文件、Python 语法、禁止发布的生成文件以及常见隐私泄漏。
 
-安装后，需要检查进化系统健康度、触发行为、台账、新鲜度或 GitHub 发布准备度时，运行独立的手动验证器：
+安装后，需要检查进化系统健康度、触发行为、台账、规则权威、新鲜度或 GitHub 发布准备度时，运行独立的手动验证器：
 
 ```text
 python ~/.codex/skills/skill-evolution-validator/scripts/validate_evolution_skills.py --mode full
 ```
+
+使用 `--project-root PATH` 检查当前仓库的 `AGENTS.md`，使用 `--framework-root PATH` 对照本地安装版与公开源码；只有当前用户请求已明确要求修复时才加 `--repair-authorized`。验证器只生成修复交接，由 `skill-evolution-core` 负责修改和完整复检。
 
 `auto` 在首次运行时执行完整检查，已有快照后执行基于日志的快速检查；快速模式会明确说明没有运行可执行行为回归。
 

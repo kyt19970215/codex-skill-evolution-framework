@@ -3,6 +3,7 @@
   "freshness_days": 30,
   "sources": [
     "https://developers.openai.com/codex/skills/",
-    "https://developers.openai.com/codex/hooks/"
+    "https://developers.openai.com/codex/hooks/",
+    "https://developers.openai.com/codex/guides/agents-md"
   ]
 }

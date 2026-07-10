@@ -63,7 +63,7 @@ Keep this file private after customization. Do not commit a filled personal vers
 
 ## Four-Layer Rule System
 
-Apply rules in this order:
+Use these layers for loading and routing ownership. This is not blanket permission for narrower project guidance to override broader hard boundaries:
 
 1. Global guidance: broad response style, verification habits, shell safety, and personal working defaults.
 2. Reusable global skills: workflows that apply across projects, such as project routing, debugging, and research verification.
@@ -71,6 +71,16 @@ Apply rules in this order:
 4. Repository `AGENTS.md`: build commands, test commands, local conventions, and commit rules for that repository.
 
 For non-trivial project work, identify the project first. Use the project-rule router when available. Add coding/debug rules for shell, build, test, path, encoding, dependency, and error triage. Add research verification for public tools, APIs, versions, dependencies, security, or current behavior.
+
+## Rule Authority And Conflict Resolution
+
+- Current system, developer, and user instructions remain above loaded guidance and continue to follow their product hierarchy.
+- Native nested `AGENTS.md` specificity still applies inside repository scope, but it is a loading and default-specialization mechanism rather than a waiver of explicitly labeled hard boundaries.
+- Global hard boundaries include explicit authorization, privacy and credential handling, safety and compliance, destructive actions, accounts, payment, publishing, deployment, and user-locked cross-project rules. Project skills and repository guidance must not silently weaken them.
+- Project guidance may specialize paths, commands, terminology, implementation details, project facts, verification, and soft workflow defaults when the specialization does not weaken a hard boundary.
+- When a conflict is about a current technical fact instead of policy, prefer current local files, configuration, versions, logs, tests, and explicit user decisions. Mark the stale global or project rule for evolution review.
+- A project exception to a personal global boundary requires explicit current-user approval and a recorded scope, rationale, one-off or durable status, and review or expiry condition. It cannot override higher system or developer boundaries.
+- If the category is unclear, do not choose silently. Ask only when the conflict changes authorization, safety, external state, outcome, or a durable direction; resolve low-risk factual conflicts from current evidence and record an evolution candidate.
 
 ## Research And Verification
 

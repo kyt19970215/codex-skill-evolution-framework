@@ -12,7 +12,7 @@ It keeps seven concerns separate:
 4. `coding-debug-rules` — triage local environment, shell, encoding, path, dependency, build, and test failures.
 5. `research-verification` — verify public tools, APIs, versions, and error behavior against current sources.
 6. `codex-capability-router` — select installed skills, plugins, apps, MCP tools, or safe discovery candidates.
-7. `skill-evolution-validator` — run manual structure, behavior, ledger, privacy, and platform-freshness audits.
+7. `skill-evolution-validator` — run manual structure, behavior, ledger, rule-authority, installed/public drift, privacy, and platform-freshness audits.
 
 Shortcut aliases are local configuration. On first installation, each user chooses one shortcut for a full evolution pass and another for capability absorption. The public framework does not impose personal trigger words.
 
@@ -68,11 +68,13 @@ python scripts/validate_framework.py
 
 The validator checks skill metadata, folder names, referenced files, script syntax, forbidden generated artifacts, and common privacy leaks.
 
-After installation, run the manual evolution-system validator when you need a health, behavior, ledger, freshness, or release-readiness report:
+After installation, run the manual evolution-system validator when you need a health, behavior, ledger, rule-authority, freshness, or release-readiness report:
 
 ```text
 python ~/.codex/skills/skill-evolution-validator/scripts/validate_evolution_skills.py --mode full
 ```
+
+Add `--project-root PATH` to inspect the active repository's `AGENTS.md`, `--framework-root PATH` to compare an installed copy with this public checkout, and `--repair-authorized` only when the same user request already asks to repair findings. The validator emits a handoff; `skill-evolution-core` owns edits and the subsequent full rerun.
 
 `auto` runs a full first pass and uses a log-based fast pass after a snapshot exists. Fast mode explicitly does not claim that executable behavior regression ran.
 

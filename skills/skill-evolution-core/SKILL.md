@@ -73,6 +73,7 @@ For passive semantic trigger observation, use `references/passive-trigger-observ
    - Inspect generated `agents/openai.yaml` for stale display text.
    - Check for placeholder text, duplicated rules, conflicting guidance, mojibake, near-miss coverage, and trigger descriptions that are too broad.
    - If a rule was relaxed, downgraded, scoped, split into trigger levels, or made conditional, verify that the final semantics and execution effect are unchanged unless the user explicitly approved the behavior change.
+   - When a validator report contains an authorized repair handoff, route the finding through `skill-evolution-router`, apply the smallest durable fix, update local ledgers, and rerun full validation. The validator remains report-only and does not own file edits.
 
 6. Report succinctly:
    - Say which skill files changed.
