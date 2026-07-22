@@ -9,7 +9,7 @@ Every report contains:
 - real Hook event count, smoke-test count, labels, and recency-weighted route summaries
 - Hook enabled state, definition/wrapper health, and local trust evidence
 - changed files and latest-ledger unmatched files
-- rule-authority status, checked global/project files, and conflict details
+- rule-authority status, checked global/project files, conflict details, and the effective global-guidance byte budget
 - installed/public framework drift with private local files excluded
 - repair authorization, handoff owner, and confirmation that the validator did not edit files
 - platform freshness date, age, and official sources

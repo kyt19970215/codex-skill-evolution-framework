@@ -11,12 +11,12 @@ It keeps seven concerns separate:
 3. `project-rules-router` — select project-specific guidance before non-trivial work.
 4. `coding-debug-rules` — triage local environment, shell, encoding, path, dependency, build, and test failures.
 5. `research-verification` — verify public tools, APIs, versions, and error behavior against current sources.
-6. `codex-capability-router` — select installed skills, plugins, apps, MCP tools, or safe discovery candidates.
-7. `skill-evolution-validator` — run manual structure, behavior, ledger, rule-authority, installed/public drift, privacy, and platform-freshness audits.
+6. `codex-capability-router` — select installed skills, plugins, apps, MCP tools, or safe discovery candidates, then require real native execution evidence.
+7. `skill-evolution-validator` — run manual structure, behavior, ledger, rule-authority, instruction-loading-budget, installed/public drift, privacy, and platform-freshness audits.
 
 Shortcut aliases are local configuration. On first installation, each user chooses one shortcut for a full evolution pass and another for capability absorption. The public framework does not impose personal trigger words.
 
-The framework also includes an optional global guidance template at `templates/global-agents-template/AGENTS.md`. It is a privacy-clean starting point for response style, smallest-sufficient execution, source and decision gates, confirmation rhythm, rule layering, verification habits, file safety, and evolution routing. It is not installed automatically because a filled global `AGENTS.md` is personal configuration.
+The framework also includes an optional global guidance template at `templates/global-agents-template/AGENTS.md`. It is a privacy-clean starting point for complete delivery, native capability use, response style, smallest-sufficient execution, source and decision gates, confirmation rhythm, rule layering, verification habits, file safety, and evolution routing. It is not installed automatically because a filled global `AGENTS.md` is personal configuration.
 
 Skill evolution now supports proportional load levels, executable routing regression cases, outcome labels, recency-weighted evidence, and observation-first passive trigger probes. The optional Hook can add one advisory route hint, but it does not execute workflows, edit files, install tools, commit, push, publish, or perform account actions.
 
@@ -76,6 +76,8 @@ python ~/.codex/skills/skill-evolution-validator/scripts/validate_evolution_skil
 
 Add `--project-root PATH` to inspect the active repository's `AGENTS.md`, `--framework-root PATH` to compare an installed copy with this public checkout, and `--repair-authorized` only when the same user request already asks to repair findings. The validator emits a handoff; `skill-evolution-core` owns edits and the subsequent full rerun.
 
+Full validation also checks the global guidance byte size against the effective Codex `project_doc_max_bytes` setting. Exceeding the limit is blocking because trailing rules may never enter context; less than 10 percent remaining headroom is reported as a maintenance warning.
+
 `auto` runs a full first pass and uses a log-based fast pass after a snapshot exists. Fast mode explicitly does not claim that executable behavior regression ran.
 
 ## Build The Local Capability Registry
@@ -86,6 +88,8 @@ After installation:
 python ~/.codex/skills/codex-capability-router/scripts/build_capability_registry.py
 python ~/.codex/skills/codex-capability-router/scripts/query_capability_router.py --task "create and review a slide deck"
 ```
+
+Explicit installed capability names rank before broad categories. Selected capabilities are execution routes rather than labels: use their entrypoints and native resources, or report a concrete fallback reason.
 
 The optional candidate refresh script queries public GitHub metadata. It does not upload local files:
 

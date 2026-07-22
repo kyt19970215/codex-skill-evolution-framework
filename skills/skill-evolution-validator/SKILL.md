@@ -18,7 +18,7 @@ Use this skill when the user explicitly asks for an evolution-system:
 - local-ledger comparison
 - platform freshness review
 - release or GitHub readiness report
-- global/project rule-authority review
+- global/project rule-authority and instruction-loading-budget review
 - installed versus public-framework source comparison
 
 Do not trigger it for routine skill edits, configured evolution shortcuts, configured absorption shortcuts, or ordinary rule-maintenance requests. Those belong to `skill-evolution-core` and `skill-evolution-router`.
@@ -26,7 +26,7 @@ Do not trigger it for routine skill edits, configured evolution shortcuts, confi
 ## Modes
 
 - `auto`: run `full` when no previous report or snapshot exists; otherwise run log-based `fast` mode.
-- `full`: run structure, semantics, behavior regression, event evidence, ledger reconciliation, rule authority, framework-source comparison, and platform freshness.
+- `full`: run structure, semantics, behavior regression, event evidence, ledger reconciliation, rule authority, instruction-loading budget, framework-source comparison, and platform freshness.
 - `fast`: compare current files with the previous snapshot and summarize existing event evidence. It must say that behavior regression was not run.
 
 Run:
@@ -40,7 +40,7 @@ Use `--project-root` for the active repository, `--framework-root` for a public 
 
 ## Required Output
 
-Every run writes Markdown, JSON, a latest snapshot, and timestamped snapshot history under the local report directory. The report must distinguish Hook definition/trust health, real observations, and smoke-test evidence; list unlabeled route outcomes; show files not represented by the latest local ledger entry; report authority conflicts and managed-source drift; and state whether the official platform review is stale.
+Every run writes Markdown, JSON, a latest snapshot, and timestamped snapshot history under the local report directory. The report must distinguish Hook definition/trust health, real observations, and smoke-test evidence; list unlabeled route outcomes; show files not represented by the latest local ledger entry; report authority conflicts, global guidance loading budget, and managed-source drift; and state whether the official platform review is stale.
 
 ## References
 

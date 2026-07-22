@@ -17,6 +17,7 @@
 - Execute every case in `regression-cases.json` against the installed passive probe.
 - Compare changed files with the latest local evolution change-log entry.
 - Check global guidance, `project-rules-router`, and the active repository `AGENTS.md` for blanket project overrides and missing hard-boundary authority rules.
+- Compare global `AGENTS.md` byte size with the effective `project_doc_max_bytes` value. Treat actual truncation as P1 and less than 10 percent remaining headroom as P2.
 - When a framework checkout is supplied, compare managed installed files with public source while excluding private ledgers, event logs, and local capability data.
 - Report private event data as counts only; do not copy prompt text into reports.
 - If the optional Hook is enabled, check the definition, wrapper, local trust record, and real conversation-event count separately.
@@ -29,3 +30,4 @@
 - Missing labels are evidence gaps, not successful routes.
 - Smoke tests are not real Hook observations.
 - The validator stays report-only. An explicit repair request produces a handoff to `skill-evolution-core`; it does not make the validator a silent editor.
+- A semantic pass does not override an instruction-loading failure; rules that never enter context are not validated behavior.

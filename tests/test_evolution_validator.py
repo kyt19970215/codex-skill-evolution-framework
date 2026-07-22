@@ -203,6 +203,76 @@ class EvolutionValidatorTests(unittest.TestCase):
         self.assertEqual(result["status"], "passed")
         self.assertEqual([], findings)
 
+    def test_agents_budget_flags_default_limit_truncation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            agents = root / "AGENTS.md"
+            config = root / "config.toml"
+            agents.write_bytes(b"x" * (32 * 1024 + 1))
+            findings: list[dict[str, str]] = []
+
+            result = self.validator.check_agents_doc_budget(
+                agents,
+                config,
+                findings,
+            )
+
+        self.assertEqual("truncated", result["status"])
+        self.assertEqual(32 * 1024, result["limit_bytes"])
+        self.assertTrue(any(item["severity"] == "P1" for item in findings))
+
+    def test_agents_budget_honors_configured_limit(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            agents = root / "AGENTS.md"
+            config = root / "config.toml"
+            agents.write_bytes(b"x" * 40000)
+            config.write_text("project_doc_max_bytes = 65536\n", encoding="utf-8")
+            findings: list[dict[str, str]] = []
+
+            result = self.validator.check_agents_doc_budget(
+                agents,
+                config,
+                findings,
+            )
+
+        self.assertEqual("passed", result["status"])
+        self.assertEqual(65536, result["limit_bytes"])
+        self.assertEqual([], findings)
+
+    def test_agents_budget_supports_python_without_tomllib(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = Path(temp_dir) / "config.toml"
+            config.write_text("project_doc_max_bytes = 49152\n", encoding="utf-8")
+            original = self.validator.tomllib
+            self.validator.tomllib = None
+            try:
+                limit, source = self.validator.project_doc_max_bytes(config)
+            finally:
+                self.validator.tomllib = original
+
+        self.assertEqual(49152, limit)
+        self.assertEqual("configured", source)
+
+    def test_authority_status_fails_when_global_guidance_is_truncated(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            agents = root / "AGENTS.md"
+            heading = b"# Rule Authority And Conflict Resolution\n"
+            agents.write_bytes(heading + b"x" * (32 * 1024))
+            findings: list[dict[str, str]] = []
+
+            result = self.validator.validate_rule_authority(
+                skills_root=ROOT / "skills",
+                global_agents=agents,
+                project_root=None,
+                findings=findings,
+                config_path=root / "config.toml",
+            )
+
+        self.assertEqual("failed", result["status"])
+        self.assertEqual("truncated", result["instruction_budget"]["status"])
+
     def test_optional_missing_global_guidance_is_not_a_failure(self) -> None:
         findings: list[dict[str, str]] = []
         result = self.validator.validate_rule_authority(

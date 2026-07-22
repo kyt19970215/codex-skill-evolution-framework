@@ -33,4 +33,5 @@ Before finishing a skill update, check:
 - Were Chinese or other non-ASCII rules read/written with explicit UTF-8?
 - Did the validator pass after structural changes?
 - For a manual validator run, did `fast` clearly remain log-based while `full` executed behavior cases and ledger reconciliation?
+- Is global `AGENTS.md` below the effective `project_doc_max_bytes` limit with enough headroom for nested project instructions, so late rules are not silently truncated?
 - Did the final answer name changed files and verification?
