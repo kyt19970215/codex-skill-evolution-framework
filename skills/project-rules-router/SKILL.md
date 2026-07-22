@@ -5,12 +5,17 @@ description: Global router for project-specific Codex rules and capability selec
 
 # Project Rules Router
 
-Use this skill as a first-pass router for project work. It does not replace local evidence, user instructions, or external verification; it decides which project-specific rules should be consulted and how strongly to trust them.
+After active system, developer, user, and global authorization/privacy/safety
+constraints have been applied, use this skill as the first project-specific
+routing pass. It does not replace local evidence, user instructions, or external
+verification; it decides which project-specific rules should be consulted and
+how strongly to trust them.
 
 ## Rule Authority And Conflict Resolution
 
-- Treat global/project layering as routing and default specificity, not blanket permission for project guidance to override every global rule.
-- Project skills and repository `AGENTS.md` may specialize paths, commands, terminology, implementation details, project facts, verification, and soft workflow defaults.
+- Apply higher-level instructions and global personal hard boundaries before selecting project guidance.
+- Use this router to select the narrowest relevant project skill. The selected project skill and repository `AGENTS.md` may then specialize paths, commands, terminology, implementation details, project facts, verification, and soft workflow defaults.
+- Treat global/project layering as routing and default specificity, not blanket permission for project guidance to override every global rule. Project guidance concretizes an already constrained task; it does not redefine the higher-level authority boundary.
 - They must not silently weaken explicit global authorization, privacy, safety, destructive-action, account/payment/publishing, or user-locked personal boundaries.
 - For current technical facts, prefer current files, configuration, versions, logs, tests, and explicit user decisions, then mark stale rules for evolution review.
 - A genuine project exception to a personal global boundary requires explicit current-user approval plus scope, rationale, one-off or durable status, and review or expiry. Higher system/developer boundaries remain unchanged.
@@ -21,6 +26,7 @@ Use this skill as a first-pass router for project work. It does not replace loca
    - Explicit project names, domains, games, products, plugins, repositories, or paths in the user request.
    - Current workspace name, repo files, package names, config files, logs, `AGENTS.md`, and nearby docs.
    - Available project skills under the user's Codex skills directory.
+   - Treat incidentally discovered processes, windows, installed apps, recent files, unrelated diagnostic paths, and historical-memory matches as environment evidence only. They are not project signals unless the user request, workspace, target file, or task object directly links them to the project.
 
 2. Select the most relevant project skill:
    - Prefer a skill explicitly named by the user.
@@ -28,10 +34,11 @@ Use this skill as a first-pass router for project work. It does not replace loca
    - Look for names such as `<project>-project`, `<project>-rules`, `<project>-research`, `<project>-debug`, or a project-specific legacy name.
    - If several skills match, read only the most relevant `SKILL.md` files and choose the narrowest applicable one.
    - Do not load unrelated project skills just because they exist.
+   - Do not carry project-only authorization boundaries or report language into an unrelated task merely because that project appeared during diagnostics.
 
 3. Add reusable global skills only when the task shape calls for them:
-   - Use `codex-capability-router` when an installed Codex plugin, plugin-provided skill, app, MCP tool, or candidate plugin may materially improve the task, especially for design, business analysis, documents, spreadsheets, presentations, PDFs, GitHub, browser/computer use, sites, role-specific workflows, or plugin discovery.
-   - Use `coding-debug-rules` for code edits, failing commands, shell/encoding/path issues, build/test failures, local scripts, and unclear technical bugs.
+   - Use `codex-capability-router` when the user names an installed capability or the project's dominant artifact/specialist workflow directly matches one. Apply its native-execution gate: exact entrypoint, required references, native tools/modules/templates, justified fallback, and concrete use evidence.
+   - Use `coding-debug-rules` for code edits and bug fixes, including root-cause and direct impact-chain review, as well as failing commands, shell/encoding/path issues, build/test failures, local scripts, and unclear technical bugs.
    - Use `research-verification` for public tools, APIs, dependencies, install/upgrade behavior, version compatibility, exact public error messages, security/anti-cheat claims, or stale/current claims.
    - Use `skill-evolution-router` when the user asks to save, remember, classify, add, split, or route a reusable rule or lesson.
    - Use `skill-evolution-core` when actually creating, updating, splitting, merging, or validating skills.
@@ -49,16 +56,13 @@ Use this skill as a first-pass router for project work. It does not replace loca
    - Treat "add a rule" style requests as permission to look back at the immediate prior user instruction and extract the durable rule, even if the user does not restate it.
    - Route the extracted rule to the narrowest global type skill or project skill.
 
-6. Apply evidence in this order:
-   - Current user request and active system/developer/project instructions.
-   - Current local evidence: files, configs, logs, exact errors, versions, and reproduction steps.
-   - The selected project skill and its references.
-   - The selected capability router result, when plugin/skill/app routing is relevant.
-   - Reusable global skill workflow, if applicable.
-   - Project-preferred public sources.
-   - Broader public sources such as official docs, release notes, GitHub issues, maintainer replies, forums, and search results.
+6. Keep rule authority separate from technical evidence:
+   - Rule application order is active system/developer/user instructions, global personal hard boundaries, the selected project skill, then the nearest repository `AGENTS.md` for concrete repo behavior.
+   - Project guidance may specialize only after the global boundary is known. It cannot silently weaken or reverse that boundary.
+   - For current technical facts, prefer current local files, configs, logs, exact errors, versions, and reproduction steps; then project-approved references; then current official sources and broader public evidence.
+   - Apply capability-router results and reusable global workflows when the task shape requires them without changing the authority order.
 
-   Before applying this evidence order, classify an apparent conflict as `hard boundary`, `specializable default`, or `current technical fact`. Evidence can replace stale facts; it cannot silently waive policy or authorization.
+   Classify an apparent conflict as `hard boundary`, `specializable default`, or `current technical fact`. Evidence can replace stale facts; it cannot silently waive policy or authorization.
 
 7. Treat project skills as priority guides, not hard boundaries:
    - A preferred source list means "check these first", not "only use these".

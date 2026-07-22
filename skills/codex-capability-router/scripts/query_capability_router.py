@@ -9,6 +9,7 @@ import json
 import os
 import re
 import sqlite3
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -127,22 +128,100 @@ def capability_named(conn: sqlite3.Connection, token: str, status: str, limit: i
     )
 
 
+def explicit_capability_matches(
+    conn: sqlite3.Connection,
+    task: str,
+    status: str,
+    limit: int,
+) -> list[dict[str, Any]]:
+    task_text = task.lower()
+    matches: list[tuple[int, int, str, dict[str, Any]]] = []
+    kind_order = {"plugin": 0, "plugin_skill": 1, "skill": 2}
+
+    for item in rows(conn, "SELECT * FROM capabilities WHERE status = ?", (status,)):
+        aliases: set[str] = set()
+        for value in (item.get("name"), item.get("display_name")):
+            alias = str(value or "").strip().lower()
+            if not alias:
+                continue
+            aliases.add(alias)
+            aliases.add(alias.replace("-", " "))
+            if ":" in alias:
+                aliases.add(alias.split(":")[-1].strip())
+
+        best = 0
+        for alias in aliases:
+            if len(alias) < 3:
+                continue
+            if re.search(r"[\u4e00-\u9fff]", alias):
+                matched = alias in task_text
+            else:
+                matched = (
+                    re.search(
+                        rf"(?<![a-z0-9]){re.escape(alias)}(?![a-z0-9])",
+                        task_text,
+                    )
+                    is not None
+                )
+            if matched:
+                best = max(best, len(alias))
+        if best:
+            matches.append(
+                (
+                    best,
+                    kind_order.get(str(item.get("kind")), 3),
+                    str(item.get("name")),
+                    item,
+                )
+            )
+
+    matches.sort(key=lambda value: (-value[0], value[1], value[2]))
+    return [item for _, _, _, item in matches[:limit]]
+
+
+TEXT_SEARCH_STOP_WORDS = {
+    "and",
+    "for",
+    "from",
+    "into",
+    "make",
+    "the",
+    "this",
+    "use",
+    "using",
+    "with",
+}
+
+
+def task_search_terms(task: str) -> list[str]:
+    terms = re.findall(r"[a-z0-9][a-z0-9+._:-]*|[\u4e00-\u9fff]{2,}", task.lower())
+    return [
+        term
+        for term in terms
+        if len(term) >= 3 and term not in TEXT_SEARCH_STOP_WORDS
+    ][:16]
+
+
 def text_search(conn: sqlite3.Connection, task: str, status: str, limit: int) -> list[dict[str, Any]]:
-    terms = [term for term in re.split(r"\s+", task.strip()) if len(term) >= 3][:8]
+    terms = task_search_terms(task)
     if not terms:
         return []
-    clauses = " OR ".join(["lower(trigger_terms) LIKE ?" for _ in terms])
-    params = tuple(f"%{term.lower()}%" for term in terms) + (status, limit)
-    return rows(
-        conn,
-        f"""
-        SELECT * FROM capabilities
-        WHERE ({clauses}) AND status = ?
-        ORDER BY name
-        LIMIT ?
-        """,
-        params,
-    )
+    kind_order = {"plugin": 0, "plugin_skill": 1, "skill": 2}
+    matches: list[tuple[int, int, str, dict[str, Any]]] = []
+    for item in rows(conn, "SELECT * FROM capabilities WHERE status = ?", (status,)):
+        haystack = str(item.get("trigger_terms") or "").lower()
+        score = sum(max(1, len(term.split())) for term in terms if term in haystack)
+        if score:
+            matches.append(
+                (
+                    score,
+                    kind_order.get(str(item.get("kind")), 3),
+                    str(item.get("name")),
+                    item,
+                )
+            )
+    matches.sort(key=lambda value: (-value[0], value[1], value[2]))
+    return [item for _, _, _, item in matches[:limit]]
 
 
 def route_task(db_path: Path, task: str, limit: int) -> dict[str, Any]:
@@ -154,22 +233,36 @@ def route_task(db_path: Path, task: str, limit: int) -> dict[str, Any]:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     categories = categories_for_task(task)
-    recommendations = []
-    candidates = []
+    recommendations = explicit_capability_matches(conn, task, "installed", limit)
+    candidates = explicit_capability_matches(conn, task, "candidate", limit)
     route_rows = []
-    for category, score in categories:
-        route_rows.extend(rows(conn, "SELECT * FROM routes WHERE category = ?", (category,)))
-    for route in route_rows:
-        for key in ("primary_capability", "fallback_capability"):
-            recommendations.extend(capability_named(conn, route.get(key, ""), "installed", limit))
-            candidates.extend(capability_named(conn, route.get(key, ""), "candidate", limit))
-    for category, score in categories:
-        recommendations.extend(capability_matches(conn, category, "installed", limit))
-        candidates.extend(capability_matches(conn, category, "candidate", limit))
-    if not recommendations:
-        recommendations = text_search(conn, task, "installed", limit)
-    if not candidates:
-        candidates = text_search(conn, task, "candidate", limit)
+    general_only = categories == [("general", 0)]
+    if general_only:
+        recommendations.extend(text_search(conn, task, "installed", limit))
+        candidates.extend(text_search(conn, task, "candidate", limit))
+    else:
+        for category, score in categories:
+            route_rows.extend(
+                rows(conn, "SELECT * FROM routes WHERE category = ?", (category,))
+            )
+        for route in route_rows:
+            for key in ("primary_capability", "fallback_capability"):
+                recommendations.extend(
+                    capability_named(conn, route.get(key, ""), "installed", limit)
+                )
+                candidates.extend(
+                    capability_named(conn, route.get(key, ""), "candidate", limit)
+                )
+        for category, score in categories:
+            recommendations.extend(
+                capability_matches(conn, category, "installed", limit)
+            )
+            candidates.extend(
+                capability_matches(conn, category, "candidate", limit)
+            )
+    if not general_only:
+        recommendations.extend(text_search(conn, task, "installed", limit))
+        candidates.extend(text_search(conn, task, "candidate", limit))
     conn.close()
     return {
         "task": task,
@@ -177,6 +270,12 @@ def route_task(db_path: Path, task: str, limit: int) -> dict[str, Any]:
         "installed_recommendations": dedupe(recommendations)[:limit],
         "candidate_plugins_or_sources": dedupe(candidates)[:limit],
         "route_notes": route_rows[:limit],
+        "use_contract": (
+            "Select only direct task owners. Treat each selected installed capability "
+            "as an execution route, not a label: read its exact entrypoint and required "
+            "official references, prefer its native tools, modules, templates, examples, "
+            "or assets, and report concrete use evidence or a justified fallback."
+        ),
         "install_boundary": "Do not install candidates automatically. Tell the user the project function and ask before installing.",
     }
 
@@ -206,7 +305,7 @@ def as_text(payload: dict[str, Any]) -> str:
     cats = ", ".join(f"{item['category']}({item['score']})" for item in payload["categories"])
     lines.append(f"Detected categories: {cats}")
     lines.append("")
-    lines.append("Installed capabilities to use first:")
+    lines.append("Installed capability candidates, exact and direct matches first:")
     if payload["installed_recommendations"]:
         for item in payload["installed_recommendations"]:
             lines.append(f"- {item.get('display_name') or item.get('name')} [{item.get('kind')}] - {short(item.get('description'))}")
@@ -220,6 +319,8 @@ def as_text(payload: dict[str, Any]) -> str:
     else:
         lines.append("- None matched.")
     lines.append("")
+    lines.append(payload["use_contract"])
+    lines.append("")
     lines.append(payload["install_boundary"])
     return "\n".join(lines)
 
@@ -232,6 +333,9 @@ def short(text: Any, length: int = 180) -> str:
 
 
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description="Route a task to Codex capabilities.")
     parser.add_argument("--task", required=True)
     parser.add_argument("--db", default=str(default_db()))

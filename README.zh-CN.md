@@ -11,12 +11,12 @@
 3. `project-rules-router`：处理非简单项目任务前选择对应的项目规则。
 4. `coding-debug-rules`：排查 Shell、编码、路径、依赖、构建和测试问题。
 5. `research-verification`：通过当前公开来源验证工具、API、版本和报错行为。
-6. `codex-capability-router`：从已安装的 Skill、插件、应用和 MCP 工具中选择合适能力。
-7. `skill-evolution-validator`：手动检查结构、触发行为、本地台账、规则权威、本地/公开版差异、隐私和平台资料新鲜度。
+6. `codex-capability-router`：从已安装的 Skill、插件、应用和 MCP 工具中选择合适能力，并要求留下真实原生执行证据。
+7. `skill-evolution-validator`：手动检查结构、触发行为、本地台账、规则权威、指令加载预算、本地/公开版差异、隐私和平台资料新鲜度。
 
 快捷触发词属于每位使用者自己的本地配置。首次安装时，使用者分别选择一个完整进化入口和一个能力吸收入口；公开框架不预设个人触发词。
 
-框架还包含一个可选的全局规则模板：`templates/global-agents-template/AGENTS.md`。它提供回答风格、最小充分执行路径、资料源与方案门禁、确认节奏、四层规则、验证习惯、文件安全和 Skill 演化路由的干净起点。模板不会自动安装，因为填好的全局 `AGENTS.md` 属于个人配置。
+框架还包含一个可选的全局规则模板：`templates/global-agents-template/AGENTS.md`。它提供完整交付、真实能力调用、回答风格、最小充分执行路径、资料源与方案门禁、确认节奏、四层规则、验证习惯、文件安全和 Skill 演化路由的干净起点。模板不会自动安装，因为填好的全局 `AGENTS.md` 属于个人配置。
 
 Skill 演化现在支持按轻重分级处理、可执行路由回归、结果标注、近期增权与长期降权，也加入了“先观察、再建议”的被动触发探针。可选 Hook 可以返回一条轻量路由建议，但不会自动执行工作流、改文件、安装工具、提交、推送、发布或操作账号。
 
@@ -76,7 +76,11 @@ python ~/.codex/skills/skill-evolution-validator/scripts/validate_evolution_skil
 
 使用 `--project-root PATH` 检查当前仓库的 `AGENTS.md`，使用 `--framework-root PATH` 对照本地安装版与公开源码；只有当前用户请求已明确要求修复时才加 `--repair-authorized`。验证器只生成修复交接，由 `skill-evolution-core` 负责修改和完整复检。
 
+完整验证还会把全局规则文件大小与 Codex 实际生效的 `project_doc_max_bytes` 配置对照。超过上限意味着尾部规则可能根本不会进入上下文，因此按阻断问题报告；剩余空间低于 10% 时给出维护提醒。
+
 `auto` 在首次运行时执行完整检查，已有快照后执行基于日志的快速检查；快速模式会明确说明没有运行可执行行为回归。
+
+本地能力路由器会让用户明确点名的已安装能力优先于宽泛分类。选中的能力是实际执行入口而不是标签：应调用它的原生入口和资源，否则需要报告具体降级原因。
 
 ## 安全定制
 

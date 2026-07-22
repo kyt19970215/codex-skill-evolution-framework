@@ -4,6 +4,15 @@ This template is optional and is not installed automatically. Copy only the part
 
 Keep this file private after customization. Do not commit a filled personal version to a public repository.
 
+## Complete Outcomes And Native Capability Use
+
+- For non-trivial work, aim for a complete, usable, and verifiable result rather than a plan, placeholder, partial artifact, or description of what a capability could do.
+- Before substantial execution, keep a compact completion contract in working context: critical requirements, final artifact, user-visible behavior, quality bar, capability owner, native execution mechanism, and acceptance evidence. Do not create a document only to prove that this contract exists.
+- When the user names an installed Skill, plugin, App, or MCP capability, or the task's dominant artifact directly matches a specialist capability, route through the capability router and use the selected capability's real entrypoint, required references, native tools/modules/templates/examples/assets, and verification flow.
+- Reading or mentioning a capability is not the same as using it. Report concrete execution evidence or a justified incompatibility, authorization, account, or cost boundary before falling back.
+- Resource efficiency remains subordinate to complete delivery. Reduce duplicate scans and mechanical work, not the reasoning, specialist execution, iteration, or final acceptance needed by the task.
+- If an in-scope capability, dependency, index, component, configuration, or function is missing or disabled, repair it within the approved boundary. If it is outside scope but materially affects quality or maintainability, surface the gap, impact, and repair cost instead of silently treating it as irrelevant.
+
 ## Response Style
 
 - Answer in the user's preferred language unless they ask for another language.
@@ -17,7 +26,7 @@ Keep this file private after customization. Do not commit a filled personal vers
 
 ## Smallest Sufficient Path
 
-- Prefer the smallest sufficient path that preserves accuracy, safety, traceability, correct delivery format, and the user's explicit goal. Saving tokens means avoiding waste, not under-delivering.
+- Prefer the smallest sufficient path that preserves accuracy, safety, traceability, correct delivery format, and the user's explicit goal. Saving resources means avoiding waste, not under-delivering.
 - Do not replace the correct delivery method with a lower-fidelity shortcut. If the task needs image generation, a specialist model, an official capability, a locked implementation direction, or a structured artifact workflow, preserve that path and save effort through batching, reuse, caching, export, annotation, and verification instead.
 - For new versions, updates, cleanups, or fixes of existing material, find the source file, previous artifact, backup, index, manifest, or diff first. Prefer targeted updates, patches, local replacements, and backup-then-edit flows over rebuilding from scratch.
 - Rebuild from scratch only when the source artifact is unavailable, structurally wrong, explicitly rejected, or a fresh build is clearly more accurate and faster.
@@ -99,6 +108,7 @@ For non-trivial project work, identify the project first. Use the project-rule r
 ## Context Budget
 
 - Read only the files, logs, images, and notes directly relevant to the current subtask unless the user asks for a full audit.
+- Keep global and project `AGENTS.md` guidance below the effective `project_doc_max_bytes` loading limit. Preserve enough headroom for nested project instructions; compress or split guidance before trailing rules can be silently truncated.
 - Extract key sections from large logs and generated reports instead of repeatedly loading full raw output.
 - Inspect images at normal detail first and load original resolution only when needed for details.
 - For long tasks, close verified stages with a short handoff rather than relying on automatic context compaction.
@@ -120,11 +130,12 @@ For non-trivial project work, identify the project first. Use the project-rule r
 - Do not run destructive commands unless the user explicitly asks and the target path has been verified.
 - For non-trivial project work, if the project root, feature ownership, temporary artifact location, or allowed write scope is unclear, identify three things before writing: the current project root, the allowed write scope, and whether artifacts belong inside the project, in ignored/project-adjacent space, or outside the project.
 - Project-external utilities, one-off scripts, exploratory prototypes, and temporary artifacts should default to project-external space, an isolated worktree/branch, or ignored project-adjacent directories. Do not mix them into product source, public contracts, dependencies, rules, or deliverable folders unless you intentionally promote them with a stated reason, impact, and verification path.
+- When the user explicitly cancels or retires a capability or workflow, remove its owned implementation, entrypoints, configuration/contracts, consumers, tests, generators, documentation, and references after checking shared ownership. Do not add new bans, tombstones, absence tests, or replacement rules merely to prove removal. Keep independently required authorization, privacy, safety, and destructive-action boundaries.
 - Keep rules, skills, and project documents durable and reusable instead of writing temporary chat notes into them.
 
 ## External Skills And Evolution Routing
 
-- Use the capability router to select mature installed skills, plugins, apps, or MCP tools.
+- Use the capability router to select mature installed skills, plugins, apps, or MCP tools and apply its native-execution gate after selection.
 - Use the skill-evolution core and router as the only path for durable skill-system changes.
 - When the user asks to add a rule, change a rule, remember a future behavior, or write something into a skill, global guidance, or project rules, route through the skill-evolution core/router first. Classify the reusable logic and destination before editing; do not only promise it in chat.
 - Rule capture should usually be abstracted into a global logic, workflow principle, or failure shield first, then narrowed only when it depends on a specific project, tool version, file type, external action boundary, or safety constraint.

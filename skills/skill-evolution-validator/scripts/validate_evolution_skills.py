@@ -13,6 +13,11 @@ import re
 from pathlib import Path
 from typing import Any
 
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.10 fallback; the framework has no dependencies.
+    tomllib = None  # type: ignore[assignment]
+
 
 EXPECTED_SKILLS = {
     "skill-evolution-core",
@@ -46,6 +51,7 @@ NEGATED_OVERRIDE_MARKERS = (
     "do not", "must not", "never", "not blanket", "cannot",
     "不得", "不要", "禁止", "不代表", "不能", "并非",
 )
+DEFAULT_PROJECT_DOC_MAX_BYTES = 32 * 1024
 
 
 def codex_home() -> Path:
@@ -69,6 +75,80 @@ def load_json(path: Path, default: Any = None) -> Any:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return default
+
+
+def project_doc_max_bytes(config_path: Path) -> tuple[int, str]:
+    try:
+        text = config_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return DEFAULT_PROJECT_DOC_MAX_BYTES, "default"
+    if tomllib is None:
+        match = re.search(
+            r"(?m)^\s*project_doc_max_bytes\s*=\s*([1-9][0-9]*)\s*(?:#.*)?$",
+            text,
+        )
+        if match:
+            return int(match.group(1)), "configured"
+        return DEFAULT_PROJECT_DOC_MAX_BYTES, "default"
+    try:
+        payload = tomllib.loads(text)
+    except tomllib.TOMLDecodeError:
+        return DEFAULT_PROJECT_DOC_MAX_BYTES, "default"
+    value = payload.get("project_doc_max_bytes")
+    if isinstance(value, int) and value > 0:
+        return value, "configured"
+    return DEFAULT_PROJECT_DOC_MAX_BYTES, "default"
+
+
+def check_agents_doc_budget(
+    agents_path: Path,
+    config_path: Path,
+    findings: list[dict[str, str]],
+) -> dict[str, Any]:
+    limit, source = project_doc_max_bytes(config_path)
+    if not agents_path.is_file():
+        return {
+            "status": "not_configured",
+            "path": str(agents_path),
+            "size_bytes": 0,
+            "limit_bytes": limit,
+            "limit_source": source,
+            "headroom_bytes": limit,
+        }
+
+    size = agents_path.stat().st_size
+    headroom = limit - size
+    status = "passed"
+    if size > limit:
+        status = "truncated"
+        add_finding(
+            findings,
+            "P1",
+            "Global guidance exceeds the configured loading limit",
+            (
+                f"{agents_path} is {size} bytes while the {source} "
+                f"project_doc_max_bytes limit is {limit}; trailing rules may not load."
+            ),
+        )
+    elif size >= int(limit * 0.9):
+        status = "near_limit"
+        add_finding(
+            findings,
+            "P2",
+            "Global guidance is close to the configured loading limit",
+            (
+                f"{agents_path} is {size} bytes with {headroom} bytes remaining "
+                "before nested project guidance risks truncation."
+            ),
+        )
+    return {
+        "status": status,
+        "path": str(agents_path),
+        "size_bytes": size,
+        "limit_bytes": limit,
+        "limit_source": source,
+        "headroom_bytes": headroom,
+    }
 
 
 def load_module(name: str, path: Path) -> Any:
@@ -199,11 +279,30 @@ def validate_rule_authority(
     project_root: Path | None,
     findings: list[dict[str, str]],
     current_dir: Path | None = None,
+    config_path: Path | None = None,
 ) -> dict[str, Any]:
     conflicts: list[dict[str, str]] = []
     checked_files: list[str] = []
+    instruction_budget = {
+        "status": "not_configured",
+        "path": "",
+        "size_bytes": 0,
+        "limit_bytes": DEFAULT_PROJECT_DOC_MAX_BYTES,
+        "limit_source": "default",
+        "headroom_bytes": DEFAULT_PROJECT_DOC_MAX_BYTES,
+    }
     if global_agents is not None:
         global_path = Path(global_agents).expanduser().resolve()
+        budget_config = (
+            Path(config_path).expanduser().resolve()
+            if config_path is not None
+            else global_path.parent / "config.toml"
+        )
+        instruction_budget = check_agents_doc_budget(
+            global_path,
+            budget_config,
+            findings,
+        )
         if global_path.is_file():
             checked_files.append(str(global_path))
             text = global_path.read_text(encoding="utf-8")
@@ -255,7 +354,11 @@ def validate_rule_authority(
             "Rule authority conflict",
             f"{len(conflicts)} authority or blanket-override issue(s) require evolution review.",
         )
-    status = "failed" if conflicts else "passed"
+    status = (
+        "failed"
+        if conflicts or instruction_budget["status"] == "truncated"
+        else "passed"
+    )
     if not checked_files:
         status = "not_configured"
     return {
@@ -263,6 +366,7 @@ def validate_rule_authority(
         "checked_files": checked_files,
         "project_agents": [str(path.resolve()) for path in project_agents],
         "conflicts": conflicts,
+        "instruction_budget": instruction_budget,
     }
 
 
@@ -710,6 +814,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     events = report["event_summary"]
     ledger = report["ledger_reconciliation"]
     authority = report["rule_authority"]
+    budget = authority["instruction_budget"]
     framework = report["framework_sync"]
     repair = report["repair_handoff"]
     hook = report["hook_health"]
@@ -751,6 +856,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Status: `{authority['status']}`",
         f"- Checked files: {len(authority['checked_files'])}",
         f"- Conflicts: {len(authority['conflicts'])}",
+        f"- Instruction loading budget: `{budget['status']}`",
+        f"- Global guidance bytes: {budget['size_bytes']} / {budget['limit_bytes']}",
         "",
         "## Installed versus public framework",
         "",
@@ -865,6 +972,7 @@ def run_validation(
             project_root=project_root,
             findings=findings,
             current_dir=project_cwd,
+            config_path=(codex_home_path or skills_root.parent) / "config.toml",
         )
         framework = compare_framework_source(
             skills_root=skills_root,
@@ -879,6 +987,14 @@ def run_validation(
             "checked_files": [],
             "project_agents": [],
             "conflicts": [],
+            "instruction_budget": {
+                "status": "not_run",
+                "path": "",
+                "size_bytes": 0,
+                "limit_bytes": DEFAULT_PROJECT_DOC_MAX_BYTES,
+                "limit_source": "default",
+                "headroom_bytes": DEFAULT_PROJECT_DOC_MAX_BYTES,
+            },
         }
         framework = {
             "status": "not_run",

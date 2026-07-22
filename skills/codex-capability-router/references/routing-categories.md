@@ -22,6 +22,9 @@ Use this table as a first-pass map. Prefer capabilities that are already install
 
 ## Ambiguous Tasks
 
+- An explicitly named installed capability outranks a broad category match. Route to that exact capability first, then check whether another capability owns a necessary adjacent phase.
+- When none is named, compare the dominant artifact and specialist workflow with installed capability descriptions. A direct match is a route; incidental overlap is not.
+- After routing, apply `installed-capability-execution-gate.md`. Do not stop at recommending or reading a selected capability when execution was requested.
 - Map the requested outcome and artifact before choosing a tool.
 - Prefer one narrow owner for each workflow.
 - If a task needs both domain reasoning and artifact production, route domain work first and artifact production second.
